@@ -1,0 +1,23 @@
+PODS:
+  - HLTStoreKit (0.7.1)
+  - Kiwi (3.0.0)
+
+DEPENDENCIES:
+  - HLTStoreKit (from `../`)
+  - Kiwi
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Kiwi
+
+EXTERNAL SOURCES:
+  HLTStoreKit:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  HLTStoreKit: bfc6f0a87cfea543dcec487f7070169152fc7295
+  Kiwi: fbeafef0f00e4d8f7dcb3420a4930afe70af77f7
+
+PODFILE CHECKSUM: 460d7e56f4e4ebc1937a98c8ce3c6f27ad87bb55
+
+COCOAPODS: 1.5.3
