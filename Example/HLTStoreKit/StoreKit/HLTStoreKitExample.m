@@ -27,12 +27,16 @@
     [self setupOrderVerifierProcessing];
     
     [[HLTStoreKit defaultStore] setOrderGenerator:[HLTOrderDefaultGenerator new]];
-    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderDefaultVerifier new]];
+    //[[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderDefaultVerifier new]];
+    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderOnDeviceVerfier new]];
     [[HLTStoreKit defaultStore] setOrderPersistence:[HLTOrderKeychainStore new]];
+    [[HLTStoreKit defaultStore] startObservingTransaction];
     
     // 清理异常数据 && 适配旧版数据
     [self clearInvalidOrders];
     [self mergeOldVersionRecords];
+    
+    //[self clearAllCacheOrders];
 }
 
 + (void)clearInvalidOrders {
@@ -70,6 +74,20 @@
     }];
 }
 
++ (void)clearAllCacheOrders {
+    NSArray<HLTOrderModel *> *orders =
+    [[HLTStoreKit defaultStore].orderPersistence getPendingOrderList];
+    [orders enumerateObjectsUsingBlock:^(HLTOrderModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [[HLTStoreKit defaultStore].orderPersistence removeOrder:obj];
+    }];
+    
+    orders =
+    [[HLTStoreKit defaultStore].orderPersistence getBackedupOrderList];
+    [orders enumerateObjectsUsingBlock:^(HLTOrderModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [[HLTStoreKit defaultStore].orderPersistence removeBackupOrder:obj];
+    }];
+}
+
 // 适配旧版数据
 + (void)mergeOldVersionRecords {
     {// 根据实际情况
@@ -102,12 +120,20 @@
             return ;
         }
         
-        [HLTNetwork createOrder:request completion:^(HLTOrderModel * _Nullable order, NSError * _Nullable error) {
-            //iapInfo.ssn = order.orderId; //todo:
-            if (completion) {
-                completion(request, order, error);
-            }
-        }];
+        HLTOrderModel *order = [HLTOrderModel new];
+        order.productId = request.productId;
+        order.orderId = @"20210112dbgss1vo2vpp9jnqchgh";
+        order.userIdentifier = @"-2623156657553671741";
+        if (completion) {
+            completion(request, order, nil);
+        }
+        
+//        [HLTNetwork createOrder:request completion:^(HLTOrderModel * _Nullable order, NSError * _Nullable error) {
+//            //iapInfo.ssn = order.orderId; //todo:
+//            if (completion) {
+//                completion(request, order, error);
+//            }
+//        }];
     }];
 }
 
@@ -123,12 +149,16 @@
             return ;
         }
         
-        [HLTNetwork verifyOrder:order completion:^(HLTOrderModel * _Nonnull order, NSError * _Nonnull error) {
-            BOOL success = (error == nil);
-            if (completion) {
-                completion(request, success, error);
-            }
-        }];
+        if (completion) {
+            completion(request, YES, nil);
+        }
+        
+//        [HLTNetwork verifyOrder:order completion:^(HLTOrderModel * _Nonnull order, NSError * _Nonnull error) {
+//            BOOL success = (error == nil);
+//            if (completion) {
+//                completion(request, success, error);
+//            }
+//        }];
     }];
 }
 

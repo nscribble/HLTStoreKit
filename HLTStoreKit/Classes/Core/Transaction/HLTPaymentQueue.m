@@ -165,7 +165,7 @@ HLTPaymentTaskDelegate
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
     for (SKPaymentTransaction *transaction in transactions) {
-        HLTLogParams(@{HLTLogEventKey: kLogEvent_SKTransaction,
+        HLTLogParams(@{HLTLogEventKey: kLogEvent_SKTransaction_Update,
                        @"transactionState": @(transaction.transactionState),
                        @"transactionIdentifier": (transaction.transactionIdentifier ?: @""),
                        @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
@@ -773,6 +773,10 @@ HLTPaymentTaskDelegate
 #pragma mark 辅助
 
 - (NSString *)createApplicationUsernameForTask:(HLTPaymentTask *)task {
+    NSString *userId = (task.order.userIdentifier ?: @"");
+    NSString *orderId = (task.order.orderId ?: @"");
+    return [orderId stringByAppendingFormat:@",%@", userId];
+    
     NSDictionary *userInfo = @{HLTTransactionUserIdKey: (task.order.userIdentifier ?: @""),
                                HLTTransactionOrderIdKey: (task.order.orderId ?: @"")
                                };
@@ -791,17 +795,15 @@ HLTPaymentTaskDelegate
         return nil;
     }
     
-    NSError *error;
-    NSData *jsonData = [applicationUsername dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *json =
-    [NSJSONSerialization JSONObjectWithData:jsonData
-                                    options:NSJSONReadingMutableLeaves|NSJSONReadingAllowFragments
-                                      error:&error];
-    if (error || !json) {
-        return nil;
-    }
     
-    return json;
+    NSArray *parts = [applicationUsername componentsSeparatedByString:@","];
+    return @{HLTTransactionUserIdKey: parts.lastObject,
+             HLTTransactionOrderIdKey: parts.firstObject
+    };
+}
+
+- (void)restoreCompletedTransactions {
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
 @end

@@ -244,7 +244,7 @@ SKProductsRequestDelegate
     __weak typeof(self) weakSelf = self;
     HLTOrderModel *voidOrder = self.order;
     [self.orderGenerator generateOrder:voidOrder success:^(HLTOrderModel *order) {
-        order.userIdentifier = voidOrder.userIdentifier;// update with void order
+        order.userIdentifier = order.userIdentifier ?: voidOrder.userIdentifier;// update with void order
         order.createdTime = voidOrder.createdTime;
         order.orderSource = voidOrder.orderSource;
         order.orderStatus = voidOrder.orderStatus;

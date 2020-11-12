@@ -31,7 +31,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"[Order][%@][%@][%@][%@][%@][%@][count:%@]", self.productId, self.orderId, [self orderStatusDescription], @(self.createdTime), @(self.iapBeginTime), @(self.iapFinishTime), @(self.receiptVerifyCount)];
+    return [NSString stringWithFormat:@"[Order][%@][%@][%@][%@][%@][%@][%@][count:%@]", self.productId, self.orderId, self.userIdentifier, [self orderStatusDescription], @(self.createdTime), @(self.iapBeginTime), @(self.iapFinishTime), @(self.receiptVerifyCount)];
 }
 
 - (NSString *)orderStatusDescription {

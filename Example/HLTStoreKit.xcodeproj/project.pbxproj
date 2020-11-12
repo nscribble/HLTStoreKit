@@ -71,6 +71,7 @@
 		71719F9E1E33DC2100824A3D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7E98C64C969556BDCAED6B7B /* Pods_HLTStoreKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HLTStoreKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		946FA1B8255BF87200AE398A /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
 		CF63E7E020A09EECE8912350 /* Pods-HLTStoreKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HLTStoreKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HLTStoreKit_Tests/Pods-HLTStoreKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		F229EC8F1D2DF0C4D69C1087 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -178,6 +179,7 @@
 				6003F596195388D20070C39A /* InfoPlist.strings */,
 				6003F599195388D20070C39A /* main.m */,
 				6003F59B195388D20070C39A /* HLTStoreKit-Prefix.pch */,
+				946FA1B8255BF87200AE398A /* Configuration.storekit */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -353,21 +355,17 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-HLTStoreKit_Example/Pods-HLTStoreKit_Example-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-HLTStoreKit_Example/Pods-HLTStoreKit_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/HLTStoreKit/HLTStoreKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HLTStoreKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HLTStoreKit_Example/Pods-HLTStoreKit_Example-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HLTStoreKit_Example/Pods-HLTStoreKit_Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C242DF761265CEB7C8C56983 /* [CP] Embed Pods Frameworks */ = {
@@ -375,21 +373,17 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-HLTStoreKit_Tests/Pods-HLTStoreKit_Tests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-HLTStoreKit_Tests/Pods-HLTStoreKit_Tests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Kiwi/Kiwi.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kiwi.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HLTStoreKit_Tests/Pods-HLTStoreKit_Tests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HLTStoreKit_Tests/Pods-HLTStoreKit_Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CE0C2DC7A6AD0D808DEDCB13 /* [CP] Check Pods Manifest.lock */ = {
@@ -560,10 +554,12 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HLTStoreKit/HLTStoreKit-Prefix.pch";
 				INFOPLIST_FILE = "HLTStoreKit/HLTStoreKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ks.storekit.example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -578,10 +574,12 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HLTStoreKit/HLTStoreKit-Prefix.pch";
 				INFOPLIST_FILE = "HLTStoreKit/HLTStoreKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ks.storekit.example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

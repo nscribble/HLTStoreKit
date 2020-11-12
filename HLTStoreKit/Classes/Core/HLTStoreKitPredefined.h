@@ -31,20 +31,20 @@ extern void (^__HLTStoreKitLogger)(NSDictionary *params, NSString *format, ...);
     }\
 }
 
-static NSString * const kLogEvent_PurchaseStart    = @"e_iap_purchase_start";
-static NSString * const kLogEvent_SKProductSuccess = @"e_iap_product_success";
-static NSString * const kLogEvent_SKProductNotFound= @"e_iap_product_not_found";
-static NSString * const kLogEvent_SKProductFailed  = @"e_iap_product_failed";
-static NSString * const kLogEvent_OrderSuccess     = @"e_iap_order_success";
-static NSString * const kLogEvent_OrderFailed      = @"e_iap_order_failed";
-//static NSString * const kLogEvent_OrderError       = @"e_iap_order_error";
-static NSString * const kLogEvent_OrderLost        = @"e_iap_order_lost";
-static NSString * const kLogEvent_SKTransaction    = @"e_iap_transaction_state";
-static NSString * const kLogEvent_SKPaymentSuccess = @"e_iap_payment_success";
-static NSString * const kLogEvent_SKPaymentNoTask  = @"e_iap_payment_notask";
-static NSString * const kLogEvent_SKPaymentFailed  = @"e_iap_payment_failed";
-static NSString * const kLogEvent_VerifySuccess    = @"e_iap_verify_success";
-static NSString * const kLogEvent_VerifyFailed     = @"e_iap_verify_failed";
+static NSString * const kLogEvent_PurchaseStart    = @"iap_purchase_start";
+static NSString * const kLogEvent_SKProductSuccess = @"iap_product_success";
+static NSString * const kLogEvent_SKProductNotFound= @"iap_product_not_found";
+static NSString * const kLogEvent_SKProductFailed  = @"iap_product_failed";
+static NSString * const kLogEvent_OrderSuccess     = @"iap_order_success";
+static NSString * const kLogEvent_OrderFailed      = @"iap_order_failed";
+//static NSString * const kLogEvent_OrderError       = @"iap_order_error";
+static NSString * const kLogEvent_OrderLost        = @"iap_order_lost";
+static NSString * const kLogEvent_SKTransaction_Update    = @"iap_transaction_update";
+static NSString * const kLogEvent_SKPaymentSuccess = @"iap_payment_success";
+static NSString * const kLogEvent_SKPaymentNoTask  = @"iap_payment_notask";
+static NSString * const kLogEvent_SKPaymentFailed  = @"iap_payment_failed";
+static NSString * const kLogEvent_VerifySuccess    = @"iap_verify_success";
+static NSString * const kLogEvent_VerifyFailed     = @"iap_verify_failed";
 
 //#define HLTLog NSLog
 

@@ -1,0 +1,110 @@
+{
+  "products" : [
+    {
+      "displayPrice" : "12",
+      "familyShareable" : false,
+      "internalID" : "68507931",
+      "localizations" : [
+        {
+          "description" : "哈哈哈",
+          "displayName" : "花田币120",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "哈哈哈哈哈哈",
+          "displayName" : "花田币120",
+          "locale" : "zh_CN"
+        }
+      ],
+      "productID" : "com.moment.coins12",
+      "referenceName" : "花田币200",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_locale" : "zh_CN",
+    "_storefront" : "CHN",
+    "_timeRate" : 4
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "ECEB9BE4",
+      "localizations" : [
+
+      ],
+      "name" : "VIP Subscription",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "30",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "244EC519",
+          "introductoryOffer" : {
+            "internalID" : "1AC8061D",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "哈哈哈哈哈",
+              "displayName" : "花田VIP会员连续包月",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "嘿嘿嘿嘿嘿",
+              "displayName" : "花田VIP会员连续包月",
+              "locale" : "zh_CN"
+            }
+          ],
+          "productID" : "com.moment.vip1",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "花田VIP 一个月",
+          "subscriptionGroupID" : "ECEB9BE4",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    },
+    {
+      "id" : "5205DB18",
+      "localizations" : [
+
+      ],
+      "name" : "SVIP Subscription",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "50",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "67FAF358",
+          "introductoryOffer" : {
+            "internalID" : "62B97E18",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "啊啊啊啊啊",
+              "displayName" : "花田高级VIP连续包月",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.moment.svip1",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "花田SVIP一个月",
+          "subscriptionGroupID" : "5205DB18",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 1,
+    "minor" : 0
+  }
+}

@@ -63,6 +63,8 @@ extern NSString * const HLTLogErrCodeKey;
  */
 - (void)tryRetrievalOrder:(HLTOrderModel *)order;
 
+- (void)restoreTransactions;
+
 @end
 
 NS_ASSUME_NONNULL_END

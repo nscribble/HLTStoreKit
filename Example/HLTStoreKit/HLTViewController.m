@@ -41,10 +41,14 @@
 }
 
 - (void)onTapBtn:(UIButton *)button {
-    NSLog(@"测试..");
     
-    NSString *productId = @"";
+    NSString *productId = @"com.moment.coins12";
+//    productId = @"com.moment.vip1";
+//    productId = @"com.moment.svip1";
     
+    [[HLTStoreKit defaultStore] purchase:productId configuration:^(id<HLTOrderConfiguration> configuration) {
+    } completion:^(NSString *productId, NSString *orderId, NSError *error) {
+    }];
 }
 
 @end
