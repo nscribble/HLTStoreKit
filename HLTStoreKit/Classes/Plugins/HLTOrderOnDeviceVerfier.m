@@ -19,6 +19,7 @@
     SKPaymentTransaction *transaction = order.skTransaction;
     NSData *receiptData = transaction.transactionReceipt;
     NSURL *receiptURL = [[NSBundle mainBundle] appStoreReceiptURL];
+    HLTLog(@"transactionReceipt: %@", receiptData);
     HLTLog(@"receiptURL: %@", receiptURL);
     
     NSData *rcptAtSandbox = nil;
@@ -30,6 +31,11 @@
                                     @"password": @"a7818c69d3d541488f9c0adfa1ec122e",
                                     @"exclude-old-transactions": @(1)
     };
+    
+    HLTLog(@"receipt.b64: \n%@", base64Rcpt);
+    
+    !successBlock ?: successBlock(order);
+    return;
     
     NSError *error = nil;
     NSData *reqJSONData = [NSJSONSerialization dataWithJSONObject:reqDictionary options:NSJSONWritingFragmentsAllowed error:&error];

@@ -43,6 +43,8 @@ extern NSString * const HLTReceiveTransactionOrderKey;
  */
 //- (void)finishPaymentTask:(HLTPaymentTask *)task;
 
+- (void)refreshPaymentReceipts;
+
 - (void)restoreCompletedTransactions;
 
 @end
