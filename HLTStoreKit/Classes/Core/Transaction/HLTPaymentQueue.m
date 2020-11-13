@@ -21,6 +21,7 @@ NSString * const HLTReceiveTransactionOrderKey = @"order";
 @interface HLTPaymentQueue ()
 <
 SKPaymentTransactionObserver,
+SKRequestDelegate,
 HLTPaymentTaskDelegate
 >
 
@@ -776,16 +777,6 @@ HLTPaymentTaskDelegate
     NSString *userId = (task.order.userIdentifier ?: @"");
     NSString *orderId = (task.order.orderId ?: @"");
     return [orderId stringByAppendingFormat:@",%@", userId];
-    
-    NSDictionary *userInfo = @{HLTTransactionUserIdKey: (task.order.userIdentifier ?: @""),
-                               HLTTransactionOrderIdKey: (task.order.orderId ?: @"")
-                               };
-    NSError *error = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:userInfo
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    return jsonString;
 }
 
 - (NSDictionary *)getOrderUserInfoFromTransaction:(SKPaymentTransaction *)transaction {
@@ -800,6 +791,28 @@ HLTPaymentTaskDelegate
     return @{HLTTransactionUserIdKey: parts.lastObject,
              HLTTransactionOrderIdKey: parts.firstObject
     };
+}
+
+#pragma mark - SKRequestDelegate
+
+- (void)requestDidFinish:(SKRequest *)request {
+    if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
+        // ⚠️凭据已刷新
+    }
+}
+
+- (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
+    if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
+        // ⚠️凭据刷新失败
+    }
+}
+
+#pragma mark -
+
+- (void)refreshPaymentReceipts {
+    SKReceiptRefreshRequest *request = [[SKReceiptRefreshRequest alloc] initWithReceiptProperties:@{SKReceiptPropertyIsExpired: @0}];
+    request.delegate = self;
+    [request start];
 }
 
 - (void)restoreCompletedTransactions {

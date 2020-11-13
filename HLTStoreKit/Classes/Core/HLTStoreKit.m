@@ -165,4 +165,8 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     [[HLTPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
+- (void)refreshPaymentReceipts {
+    [[HLTPaymentQueue defaultQueue] refreshPaymentReceipts];
+}
+
 @end
