@@ -810,7 +810,7 @@ HLTPaymentTaskDelegate
 #pragma mark -
 
 - (void)refreshPaymentReceipts {
-    SKReceiptRefreshRequest *request = [[SKReceiptRefreshRequest alloc] initWithReceiptProperties:@{SKReceiptPropertyIsExpired: @0}];
+    SKReceiptRefreshRequest *request = [[SKReceiptRefreshRequest alloc] initWithReceiptProperties:@{}];
     request.delegate = self;
     [request start];
 }

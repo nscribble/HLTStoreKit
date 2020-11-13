@@ -49,6 +49,8 @@
     [[HLTStoreKit defaultStore] purchase:productId configuration:^(id<HLTOrderConfiguration> configuration) {
     } completion:^(NSString *productId, NSString *orderId, NSError *error) {
     }];
+    
+    [[HLTStoreKit defaultStore] refreshPaymentReceipts];
 }
 
 @end
