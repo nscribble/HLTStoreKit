@@ -47,7 +47,7 @@
     self.transactionDate = transaction.transactionDate;
     self.applicationUsername = transaction.payment.applicationUsername;
     
-    if (!self.receiptData && transaction.transactionReceipt) {
+    if (transaction.transactionReceipt) {// !self.receiptData && 
         self.receiptData = transaction.transactionReceipt;
     }
     if (!self.receiptURL) {

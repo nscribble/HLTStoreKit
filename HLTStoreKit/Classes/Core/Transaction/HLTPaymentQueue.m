@@ -382,7 +382,7 @@ HLTPaymentTaskDelegate
     }
     
     if (!order) {// 即时拯救 todo: 用户未登录不做处理？&& orderId
-        HLTLogParams(@{HLTLogEventKey: kLogEvent_OrderLost}, @"[Payment] Transaction order lost: %@|%@", productId, orderId);
+        HLTLogParams(@{HLTLogEventKey: kLogEvent_OrderNotFound}, @"[Payment] Transaction order lost: %@|%@", productId, orderId);
         NSString *productId = transaction.payment.productIdentifier;
         order = [[HLTOrderModel alloc] initWithProductId:productId];
         order.orderId = orderId;
