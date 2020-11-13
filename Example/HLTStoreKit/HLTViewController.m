@@ -10,6 +10,7 @@
 #import <HLTStoreKit/HLTStoreKit.h>
 #import <HLTStoreKit/HLTOrderDefaultGenerator.h>
 #import <HLTStoreKit/HLTOrderDefaultVerifier.h>
+#import "RMAppReceipt.h"
 
 @interface HLTViewController ()
 
@@ -43,12 +44,22 @@
 - (void)onTapBtn:(UIButton *)button {
     
     NSString *productId = @"com.moment.coins12";
-//    productId = @"com.moment.vip1";
+    productId = @"com.moment.vip1";
 //    productId = @"com.moment.svip1";
+        
+//    [[HLTStoreKit defaultStore] purchase:productId configuration:^(id<HLTOrderConfiguration> configuration) {
+//    } completion:^(NSString *productId, NSString *orderId, NSError *error) {
+//    }];
     
-    [[HLTStoreKit defaultStore] purchase:productId configuration:^(id<HLTOrderConfiguration> configuration) {
-    } completion:^(NSString *productId, NSString *orderId, NSError *error) {
-    }];
+    [[HLTStoreKit defaultStore] refreshPaymentReceipts];
+    
+    NSArray *tids = [[[RMAppReceipt bundleReceipt] inAppPurchases] valueForKeyPath:@"transactionIdentifier"];
+    HLTLog(@"tids: %@", tids);
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSArray *tids = [[[RMAppReceipt bundleReceipt] inAppPurchases] valueForKeyPath:@"transactionIdentifier"];
+        HLTLog(@"delay tids: %@", tids);
+    });
 }
 
 @end

@@ -47,6 +47,16 @@
                ReferencedContainer = "container:HLTStoreKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "94E98EC6255D518D00498064"
+               BuildableName = "HLTStoreKit_ExampleTests.xctest"
+               BlueprintName = "HLTStoreKit_ExampleTests"
+               ReferencedContainer = "container:HLTStoreKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

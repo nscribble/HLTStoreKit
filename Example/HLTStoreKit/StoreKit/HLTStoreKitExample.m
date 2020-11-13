@@ -9,6 +9,7 @@
 #import "HLTStoreKitExample.h"
 #import <HLTStoreKit/HLTStoreKit-umbrella.h>
 #import "HLTNetwork.h"
+#import "HLTLocalReceiptVerifier.h"
 
 @implementation HLTStoreKitExample
 
@@ -28,7 +29,7 @@
     
     [[HLTStoreKit defaultStore] setOrderGenerator:[HLTOrderDefaultGenerator new]];
     //[[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderDefaultVerifier new]];
-    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderOnDeviceVerfier new]];
+    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTLocalReceiptVerifier new]];
     [[HLTStoreKit defaultStore] setOrderPersistence:[HLTOrderKeychainStore new]];
     [[HLTStoreKit defaultStore] startObservingTransaction];
     
