@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface HLTLocalReceiptVerifier : NSObject<HLTOrderVerifier>
 
++ (void)injectCertificate:(NSURL *)certURL;
+
 - (void)verifyOrder:(HLTOrderModel *)order success:(void (^)(HLTOrderModel *))successBlock failure:(void (^)(NSError *))failureBlock;
 
 @end

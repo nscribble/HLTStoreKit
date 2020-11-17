@@ -19,6 +19,10 @@
 
 @implementation HLTLocalReceiptVerifier
 
++ (void)injectCertificate:(NSURL *)certURL {
+    [RMAppReceipt setAppleRootCertificateURL:certURL];
+}
+
 - (RMStoreAppReceiptVerifier *)rm_verifier {
     if (!_rm_verifier) {
         _rm_verifier = [RMStoreAppReceiptVerifier new];

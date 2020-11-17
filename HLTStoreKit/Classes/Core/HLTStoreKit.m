@@ -90,7 +90,7 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     }
     
     HLTRetrievalTask *task = [[HLTRetrievalTask alloc] initWithOrder:order skTransaction:transaction completion:^(NSString *productId, NSString *orderId, NSError *error) {
-        HLTLog(@"恢复丢单 订单流程结束: %@ | %@ | %@", productId, orderId, error);
+        HLTLog(@"恢复丢单/续费订阅 订单流程结束: %@ | %@ | %@", productId, orderId, error);
     }];
     task.orderGenerator = self.orderGenerator;
     task.orderVerifier = self.orderVerifier;

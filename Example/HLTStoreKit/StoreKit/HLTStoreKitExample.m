@@ -33,6 +33,8 @@
     [[HLTStoreKit defaultStore] setOrderPersistence:[HLTOrderKeychainStore new]];
     [[HLTStoreKit defaultStore] startObservingTransaction];
     
+    [HLTLocalReceiptVerifier injectCertificate:[[NSBundle mainBundle] URLForResource:@"StoreKitTest" withExtension:@"cer"]];
+    
     // 清理异常数据 && 适配旧版数据
     [self clearInvalidOrders];
     [self mergeOldVersionRecords];

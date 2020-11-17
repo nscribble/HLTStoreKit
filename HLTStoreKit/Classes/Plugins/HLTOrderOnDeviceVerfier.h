@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface HLTOrderOnDeviceVerfier : NSObject<HLTOrderVerifier>
 
+@property (nonatomic, copy) NSString *sharedCredential;
+
 - (void)verifyOrder:(HLTOrderModel *)order
             success:(void (^)(HLTOrderModel *order))successBlock
             failure:(void (^)(NSError *error))failureBlock;
