@@ -7,9 +7,9 @@
 //
 
 #import "HLTStoreKitExample.h"
-#import <HLTStoreKit/HLTStoreKit-umbrella.h>
+#import <HLTStoreKit/HLTStoreKit.h>
 #import "HLTNetwork.h"
-#import "HLTLocalReceiptVerifier.h"
+#import <HLTStoreKit/HLTLocalReceiptVerifier.h>
 
 @implementation HLTStoreKitExample
 

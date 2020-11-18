@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HLTStoreKit'
-  s.version          = '0.8.1'
+  s.version          = '0.8.3'
   s.summary          = 'HLTStoreKit is to ease your pain for iap.'
 
 # This description is used to generate tags and improve search results.
@@ -36,7 +36,7 @@ HLTStoreKit is to ease your pain for iap. just have a try.
   #   'HLTStoreKit' => ['HLTStoreKit/Assets/*.png']
   # }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
+  s.public_header_files = ['HLTStoreKit/Classes/Core/**/*.h', 'HLTStoreKit/Classes/Plugins/**/*.h']
   s.frameworks = 'StoreKit', 'Foundation'
 #  s.dependency 'HLTAPIClient'
 end
