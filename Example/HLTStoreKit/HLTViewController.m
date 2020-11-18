@@ -51,7 +51,7 @@
 //    } completion:^(NSString *productId, NSString *orderId, NSError *error) {
 //    }];
     
-    [[HLTStoreKit defaultStore] refreshPaymentReceipts];
+    [[HLTStoreKit defaultStore] refreshPaymentReceipts:NULL];
     
     NSArray *tids = [[[RMAppReceipt bundleReceipt] inAppPurchases] valueForKeyPath:@"transactionIdentifier"];
     HLTLog(@"tids: %@", tids);

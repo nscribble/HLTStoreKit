@@ -9,6 +9,7 @@
 #import "SKProductsRequest+Ext.h"
 #import "NSObject+Ext.h"
 #import "NSError+Ext.h"
+
 @import StoreKit;
 
 NSString * const HLTStoreKitErrorDomain = @"com.hlt.storekit.error";
@@ -129,52 +130,31 @@ SKProductsRequestDelegate
         [self.delegate taskWillStart:self];
     }
     
-    // 查询商品信息
-    if ([self.delegate respondsToSelector:@selector(taskWillFetchProductInfo:)]) {
-        [self.delegate taskWillFetchProductInfo:self];
-    }
-    SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:self.productId]];
-    request.delegate = self;
-    request.hlt_productIdentifier = self.productId;
-    [request start];
+    NSAssert(self.productProvider != nil, @"productProvider is required when create a payment task");
+    __weak typeof(self) ws = self;
+    [self.productProvider fetchProductOfIdentifier:self.productId completion:^(SKProduct * _Nullable product, NSError * _Nullable error) {
+        [ws onFetchedProduct:product error:error];
+    }];
 }
 
-#pragma mark - SKProductsRequestDelegate
-
-- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
-    if (response.invalidProductIdentifiers.count > 0 &&
-        [response.invalidProductIdentifiers containsObject:self.productId]) {
+- (void)onFetchedProduct:(SKProduct *)product error:(NSError *)error {
+    if (!product) {
+        HLTLogParams(@{HLTLogEventKey: (error ? kLogEvent_SKProductFailed : kLogEvent_SKProductNotFound)
+                       HLTLogErrorKey: (error ?: @"errorNil"),
+                       @"productId": (self.productId ?: @"productIdNil"),
+                     }, @"SKProduct Failed/NotFound for (%@)", self.productId);
+        
         [self callBackWithErrCode:HLTPaymentErrorProductInvalid
                       description:@"产品ID无效（App Store）"];
         return;
     }
     
-    // 查询信息成功
-    SKProduct *skProduct = [response.products lastObject];// 注：只查询了一个id
-    self.skProduct = skProduct;
+    // =>创建订单
+    HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductSuccess}, @"SKProduct fetched");
+    self.skProduct = product;
     if ([self.delegate respondsToSelector:@selector(taskDidFetchProductInfo:)]) {
         [self.delegate taskDidFetchProductInfo:self];
     }
-    
-    if (!skProduct) {
-        HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductNotFound}, @"SKProductNotFound, invalid: %@, will use %@", response.invalidProductIdentifiers, self.productId);
-    } else {
-        HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductSuccess}, @"SKProductSuccess");
-    }
-    
-    // 创建订单
-    [self processToCreateOrder];
-}
-
-- (void)requestDidFinish:(SKRequest *)request {
-    HLTLog(@"[Task] requestDidFinish: %@", request);
-}
-
-- (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
-    HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductFailed,
-                   HLTLogErrorKey: (error ?: @"errorNil"),
-                   @"productId": (self.productId ?: @"productIdNil"),
-                   }, @"[Task] %@ failed: %@", request, error);
     [self processToCreateOrder];
 }
 

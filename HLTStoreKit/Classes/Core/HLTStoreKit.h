@@ -45,7 +45,22 @@ extern NSString * const HLTLogErrCodeKey;
  @note 建议启动后开始监听
  */
 - (void)startObservingTransaction;
+
+/// 停止监听IAP交易回调
 - (void)stopObservingTransaction;
+
+/// 获取商品实例
+/// @note 这是Prefetch或之前拿到的`SKProduct`
+/// @param identifier 商品id
+- (SKProduct *)productForIdentifier:(NSString *)identifier;
+
+/// 获取商品信息
+/// @note 可以预获取商品信息
+/// @param productIdentifiers 商品id列表
+- (void)fetchProducts:(NSArray<NSString *> *)productIdentifiers
+           completion:(HLTProductRequestCompletion)completion;
+
+#pragma mark -
 
 /**
  购买商品
@@ -54,7 +69,9 @@ extern NSString * const HLTLogErrCodeKey;
  @param productId 商品ID
  @param completion 完成回调
  */
-- (void)purchase:(NSString *)productId configuration:(HLTOrderConfigurationBlock __nullable)configuration completion:(HLTPaymentCompletion __nullable)completion;
+- (void)purchase:(NSString *)productId
+   configuration:(HLTOrderConfigurationBlock __nullable)configuration
+      completion:(HLTPaymentCompletion __nullable)completion;
 
 /**
  重试订单（主要是verify）
@@ -63,8 +80,11 @@ extern NSString * const HLTLogErrCodeKey;
  */
 - (void)tryRetrievalOrder:(HLTOrderModel *)order;
 
-- (void)refreshPaymentReceipts;
+/// 刷新凭据
+/// @param completion 完成回调
+- (void)refreshPaymentReceipts:(HLTReceiptRefreshCompletion)completion;
 
+/// 恢复交易
 - (void)restoreTransactions;
 
 @end

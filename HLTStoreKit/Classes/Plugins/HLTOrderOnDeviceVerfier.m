@@ -44,7 +44,7 @@
     NSURL *validateURL = [NSURL URLWithString:@"https://buy.itunes.apple.com/verifyReceipt"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:validateURL];
     request.HTTPMethod = @"POST";
-    request.HTTPBody = reqJSONData;
+    request.HTTPBody = httpBody;
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
@@ -87,7 +87,7 @@
     NSURL *validateURL = [NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:validateURL];
     request.HTTPMethod = @"POST";
-    request.HTTPBody = reqJSONData;
+    request.HTTPBody = httpBody;
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];

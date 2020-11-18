@@ -34,6 +34,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@class SKProduct;
+@protocol HLTAppleProductProvider <NSObject>
+
+- (void)fetchProductOfIdentifier:(NSString *)identifier completion:(void(^)(SKProduct * _Nullable product, NSError *_Nullable error))completion;
+
+@end
+
 typedef void(^HLTPaymentTaskBlock)(BOOL success);
 @interface HLTPaymentTask : NSOperation<HLTOrderConfiguration>
 {
@@ -55,6 +62,8 @@ typedef void(^HLTPaymentTaskBlock)(BOOL success);
 @property (nonatomic,assign,readonly) NSTimeInterval startTime;
 // 商品（查询到商品信息后可取）
 @property (nonatomic,strong,readonly,nullable) SKProduct *skProduct;
+// 商品信息提供者
+@property (nonatomic,weak) id<HLTAppleProductProvider> productProvider;
 // 订单生成器
 @property (nonatomic,weak) id<HLTOrderGenerator> orderGenerator;
 // 订单校验器

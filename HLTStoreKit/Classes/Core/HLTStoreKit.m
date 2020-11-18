@@ -9,11 +9,18 @@
 #import "HLTPaymentQueue.h"
 #import "HLTPaymentTask.h"
 #import "HLTRetrievalTask.h"
+#import "HLTPrefetchProductsTask.h"
+#import "HLTRefreshReceiptTask.h"
 #import "NSObject+Ext.h"
 
 @import StoreKit;
 
 @interface HLTStoreKit ()
+<
+HLTAppleProductProvider
+>
+
+@property (nonatomic, strong) NSMutableDictionary<NSString *, SKProduct *> *id2Products;
 
 /**
  默认配置
@@ -50,6 +57,14 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     }
     
     return self;
+}
+
+- (NSMutableDictionary<NSString *,SKProduct *> *)id2Products{
+    if (!_id2Products) {
+        _id2Products = [NSMutableDictionary dictionary];
+    }
+    
+    return _id2Products;
 }
 
 #pragma mark -
@@ -89,13 +104,18 @@ NSString * const HLTLogErrCodeKey = @"err_code";
         return;
     }
     
-    HLTRetrievalTask *task = [[HLTRetrievalTask alloc] initWithOrder:order skTransaction:transaction completion:^(NSString *productId, NSString *orderId, NSError *error) {
-        HLTLog(@"恢复丢单/续费订阅 订单流程结束: %@ | %@ | %@", productId, orderId, error);
-    }];
-    task.orderGenerator = self.orderGenerator;
-    task.orderVerifier = self.orderVerifier;
+    if (!transaction.transactionReceipt) {
+        BOOL isReceiptUpToDate = NO;
+        if (!isReceiptUpToDate) {
+            [self refreshPaymentReceipts:^(NSError *error, NSURL *receiptURL) {
+                [self __tryRetrievalOrder:order transaction:transaction];
+            }];
+            
+            return;
+        }
+    }
     
-    [[HLTPaymentQueue defaultQueue] addPaymentTask:task];
+    [self __tryRetrievalOrder:order transaction:transaction];
 }
 
 #pragma mark - Public
@@ -123,13 +143,60 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     [[SKPaymentQueue defaultQueue] removeTransactionObserver:[HLTPaymentQueue defaultQueue]];
 }
 
+#pragma mark - Payment
+
+- (SKProduct *)productForIdentifier:(NSString *)identifier {
+    if (![identifier isKindOfClass:[NSString class]] ||
+        identifier.length <= 0) {
+        return nil;
+    }
+    
+    return self.id2Products[identifier];
+}
+
+/// 预获取商品信息
+/// @param productIdentifiers 商品id列表
+- (void)fetchProducts:(NSArray<NSString *> *)productIdentifiers
+           completion:(HLTProductRequestCompletion)completion {
+    if (productIdentifiers.count <= 0) {
+        HLTLog(@"productIds.count = 0");
+        return;
+    }
+    
+    NSMutableArray *filtered = [NSMutableArray array];
+    [productIdentifiers enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (self.id2Products[obj]) {
+            return;
+        }
+        
+        [filtered addObject:obj];
+    }];
+    
+    if (filtered.count <= 0) {
+        HLTLog(@"filtered productIds.count = 0");
+        return;
+    }
+    
+    HLTPrefetchProductsTask *task = [[HLTPrefetchProductsTask alloc] initWithProductIdentifiers:productIdentifiers completion:^(NSArray<SKProduct *> *products, NSError *error) {
+        if (products.count > 0) {
+            [products enumerateObjectsUsingBlock:^(SKProduct * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                self.id2Products[obj.productIdentifier] = obj;
+            }];
+        }
+        
+        !completion ?: completion(products, error);
+    }];
+    
+    [[HLTPaymentQueue defaultQueue] addFetchTask:task];
+}
+
 - (void)purchase:(NSString *)productId configuration:(HLTOrderConfigurationBlock)configuration completion:(HLTPaymentCompletion)completion {
     HLTLogParams(@{HLTLogEventKey: kLogEvent_PurchaseStart,
                    @"productId": (productId ?: @"productIdNil")
                    }, @"[Store] purchase: %@", productId);
     if (![SKPaymentQueue canMakePayments]) {
         if (completion) {
-            NSError *err = [self ht_storeKitErrorWithCode:HLTPaymentErrorCantMakePayment
+            NSError *err = [self ht_storeKitErrorWithCode:HLTPaymentErrorCanNotMakePayment
                                               description:@"设备不支持应用内购买"];
             completion(productId, nil, err);
         }
@@ -139,6 +206,8 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     HLTPaymentTask *task = [[HLTPaymentTask alloc] initWithProductId:productId completion:completion];
     task.orderGenerator = self.orderGenerator;
     task.orderVerifier = self.orderVerifier;
+    task.productProvider = self;
+    
     if (configuration) {
         configuration(task);
     }
@@ -147,7 +216,7 @@ NSString * const HLTLogErrCodeKey = @"err_code";
 }
 
 - (void)tryRetrievalOrder:(HLTOrderModel *)order {
-    if ([[HLTPaymentQueue defaultQueue] isPaymentOrderInTask:order]) {
+    if ([[HLTPaymentQueue defaultQueue] isOrderAlreadyInTask:order]) {
         HLTLog(@"[Store] to retrieved order is already in task!");
         return;
     }
@@ -161,12 +230,48 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     [[HLTPaymentQueue defaultQueue] addPaymentTask:task];
 }
 
-- (void)restoreTransactions {
-    [[HLTPaymentQueue defaultQueue] restoreCompletedTransactions];
+- (void)__tryRetrievalOrder:(HLTOrderModel *)order transaction:(SKPaymentTransaction *)transaction {
+    HLTRetrievalTask *task = [[HLTRetrievalTask alloc] initWithOrder:order skTransaction:transaction completion:^(NSString *productId, NSString *orderId, NSError *error) {
+        HLTLog(@"恢复丢单/续费订阅 订单流程结束: %@ | %@ | %@", productId, orderId, error);
+    }];
+    task.orderGenerator = self.orderGenerator;
+    task.orderVerifier = self.orderVerifier;
+    
+    [[HLTPaymentQueue defaultQueue] addPaymentTask:task];
 }
 
-- (void)refreshPaymentReceipts {
-    [[HLTPaymentQueue defaultQueue] refreshPaymentReceipts];
+#pragma mark -
+
+- (void)restoreTransactions {
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+}
+
+- (void)refreshPaymentReceipts:(HLTReceiptRefreshCompletion)completion {
+    HLTRefreshReceiptTask *task = [[HLTRefreshReceiptTask alloc] initWithCompletion:completion];
+    [[HLTPaymentQueue defaultQueue] addFetchTask:task];
+}
+
+#pragma mark - HLTAppleProductProvider
+
+- (void)fetchProductOfIdentifier:(NSString *)identifier completion:(nonnull void (^)(SKProduct * _Nullable, NSError * _Nullable))completion {
+    if (![identifier isKindOfClass:[NSString class]] ||
+        identifier.length <= 0) {
+        NSError *error = [self ht_storeKitErrorWithCode:HLTPaymentErrorProductIdInvalid
+                                            description:@"商品信息有误"];
+        !completion ?: completion(nil, error);
+        
+        return;
+    }
+    
+    SKProduct *product = [self productForIdentifier:identifier];
+    if (product) {
+        !completion ?: completion(product, nil);
+        return;
+    }
+    
+    [self fetchProducts:@[identifier] completion:^(NSArray<SKProduct *> *products, NSError *error) {
+        !completion ?: completion(products.lastObject, error);
+    }];
 }
 
 @end

@@ -45,20 +45,28 @@ static NSString * const kLogEvent_SKPaymentNoTask  = @"iap_payment_notask";
 static NSString * const kLogEvent_SKPaymentFailed  = @"iap_payment_failed";
 static NSString * const kLogEvent_VerifySuccess    = @"iap_verify_success";
 static NSString * const kLogEvent_VerifyFailed     = @"iap_verify_failed";
+static NSString * const kLogEvent_PrefetchProductsSuccess  = @"iap_prefetch_products_success";
+static NSString * const kLogEvent_PrefetchProductsFailed  = @"iap_prefetch_products_failed";
 
 //#define HLTLog NSLog
 
+@class SKProduct;
 // 交易配置
 typedef void(^HLTOrderConfigurationBlock)(id<HLTOrderConfiguration> configuration);
 // 交易结束回调
 typedef void(^HLTPaymentCompletion)(NSString *productId, NSString *orderId, NSError *error);
 // 查询商品信息回调
-typedef void(^HLTProductRequestCompletion)(NSString *productId, NSArray<SKProduct *> *, NSError *error);
+typedef void(^HLTProductFetchCompletion)(NSString *productId, NSArray<SKProduct *> *products, NSError *error);
+// 刷新凭据回调
+typedef void(^HLTReceiptRefreshCompletion)(NSError *error, NSURL *receiptURL);
+// 查询商品信息回调
+typedef void(^HLTProductRequestCompletion)(NSArray<SKProduct *> *products, NSError *error);
 
 typedef NS_ENUM(NSInteger, HLTPaymentErrorCode) {
     HLTPaymentErrorNone,
     HLTPaymentErrorNoNetwork,
-    HLTPaymentErrorCantMakePayment,
+    HLTPaymentErrorCanNotMakePayment,
+    HLTPaymentErrorProductIdInvalid,
     HLTPaymentErrorProductInvalid,
     HLTPaymentErrorProductNotFound,
     HLTPaymentErrorCreateOrderFailed,

@@ -52,7 +52,7 @@
             [[HLTStoreKit defaultStore].orderPersistence removeOrder:obj];
         }
         else if (obj.orderStatus < HLTOrderStatusPurchased &&// 移到备份队列
-                 ![[HLTPaymentQueue defaultQueue] isPaymentOrderInTask:obj]) {
+                 ![[HLTPaymentQueue defaultQueue] isOrderAlreadyInTask:obj]) {
             [[HLTStoreKit defaultStore].orderPersistence storeBackupOrder:obj];
             [[HLTStoreKit defaultStore].orderPersistence removeOrder:obj];
         }
