@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HLTStoreKit'
-  s.version          = '0.8.0'
+  s.version          = '0.8.1'
   s.summary          = 'HLTStoreKit is to ease your pain for iap.'
 
 # This description is used to generate tags and improve search results.
