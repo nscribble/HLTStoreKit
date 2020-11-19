@@ -1,5 +1,5 @@
 PODS:
-  - HLTStoreKit (0.8.3)
+  - HLTStoreKit (0.8.5)
   - Kiwi (3.0.0)
 
 DEPENDENCIES:
@@ -15,7 +15,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  HLTStoreKit: a52892aeffeda99ba098db27715d53e0282c904d
+  HLTStoreKit: 7072c89bf8bb209cd7cefa21d42bfb0425ca3685
   Kiwi: fbeafef0f00e4d8f7dcb3420a4930afe70af77f7
 
 PODFILE CHECKSUM: 876a307d5b33b901d211a72b70813d4b12c267cb

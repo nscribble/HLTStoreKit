@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HLTStoreKit'
-  s.version          = '0.8.3'
+  s.version          = '0.8.5'
   s.summary          = 'HLTStoreKit is to ease your pain for iap.'
 
 # This description is used to generate tags and improve search results.
@@ -39,4 +39,16 @@ HLTStoreKit is to ease your pain for iap. just have a try.
   s.public_header_files = ['HLTStoreKit/Classes/Core/**/*.h', 'HLTStoreKit/Classes/Plugins/**/*.h']
   s.frameworks = 'StoreKit', 'Foundation'
 #  s.dependency 'HLTAPIClient'
+#  s.pod_target_xcconfig = {}
+  s.vendored_libraries = ['libraries/openssl-1.0.1e/lib/libcrypto.a', 'libraries/openssl-1.0.1e/lib/libssl.a']
+  s.xcconfig = { "HEADER_SEARCH_PATHS" => "${PODS_ROOT}/#{s.name}/libraries/openssl-1.0.1e/include"}
+
+#  s.subspec 'openssl' do |openssl|
+##    openssl.preserve_paths = 'libraries/openssl-1.0.1e/include/openssl/*.h', 'libraries/openssl-1.0.1e/include/LICENSE'
+#    openssl.vendored_libraries = 'libraries/openssl-1.0.1e/lib/libcrypto.a', 'libraries/openssl-1.0.1e/lib/libssl.a'
+#    openssl.source_files = "libraries/openssl-1.0.1e/**/*"
+##    openssl.libraries = 'ssl', 'crypto'
+##    openssl.header_dir = "openssl"
+##    openssl.xcconfig = { 'HEADER_SEARCH_PATHS' => "${PODS_ROOT}/#{s.name}/libraries/openssl-1.0.1e/include/**" }
+#  end
 end
