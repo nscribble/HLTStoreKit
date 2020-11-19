@@ -9,6 +9,7 @@
 #import "HLTPaymentTask.h"
 #import "HLTRetrievalTask.h"
 #import "HLTJailbreakDetect.h"
+
 @import StoreKit;
 
 static NSString * const HLTTransactionUserIdKey = @"userId";
@@ -26,13 +27,17 @@ HLTPaymentTaskDelegate
 >
 
 // 任务队列
-@property (nonatomic, strong) NSOperationQueue *queue;
+@property (nonatomic, strong) NSOperationQueue *taskQueue;
+@property (nonatomic, strong) NSOperationQueue *fetchQueue;
 // 当前任务
 @property (nonatomic, strong) HLTPaymentTask *currentTask;
 // 队列中任务列表（为多task并发做支持，如果applicationUserName稳定可用）
 @property (nonatomic, strong) NSMutableArray<HLTPaymentTask *> *tasks;
 // (队列)启动时间
 @property (nonatomic, assign, readwrite) NSTimeInterval launchTime;
+
+// 不使用applicationUserName来做交易
+@property (nonatomic, assign) BOOL doNotUseApplicationUsername;
 
 @end
 
@@ -56,15 +61,26 @@ HLTPaymentTaskDelegate
     return self;
 }
 
-- (NSOperationQueue *)queue {
-    if (!_queue) {
-        _queue = [[NSOperationQueue alloc] init];
-        _queue.name = @"com.hltstorekit.taskqueue";
-        _queue.maxConcurrentOperationCount = 1;
-        _queue.qualityOfService = NSQualityOfServiceUserInitiated;
+- (NSOperationQueue *)taskQueue {
+    if (!_taskQueue) {
+        _taskQueue = [[NSOperationQueue alloc] init];
+        _taskQueue.name = @"com.hltstorekit.taskqueue";
+        _taskQueue.maxConcurrentOperationCount = 1;
+        _taskQueue.qualityOfService = NSQualityOfServiceUserInteractive;
     }
     
-    return _queue;
+    return _taskQueue;
+}
+
+- (NSOperationQueue *)fetchQueue {
+    if (!_fetchQueue) {
+        _fetchQueue = [[NSOperationQueue alloc] init];
+        _fetchQueue.name = @"com.hltstorekit.fetchqueue";
+        _fetchQueue.maxConcurrentOperationCount = 5;
+        _fetchQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+    }
+    
+    return _taskQueue;
 }
 
 - (NSMutableArray<HLTPaymentTask *> *)tasks {
@@ -75,9 +91,20 @@ HLTPaymentTaskDelegate
     return _tasks;
 }
 
+#pragma mark - Public
+
+- (void)setTaskConcurrentCount:(NSInteger)count {
+    NSAssert(count > 0, @"count must > 0");
+    self.taskQueue.maxConcurrentOperationCount = count;
+}
+
+- (void)disableApplicationUsername {
+    self.doNotUseApplicationUsername = YES;
+}
+
 #pragma mark -
 
-- (BOOL)isPaymentOrderInTask:(HLTOrderModel *)order {
+- (BOOL)isOrderAlreadyInTask:(HLTOrderModel *)order {
     if (!order) {
         return NO;
     }
@@ -96,6 +123,10 @@ HLTPaymentTaskDelegate
     return result;
 }
 
+- (void)addFetchTask:(NSOperation *)task {
+    [self.fetchQueue addOperation:task];
+}
+
 - (void)addPaymentTask:(HLTPaymentTask *)task {
     HLTLog(@"[Payment] add PaymentTask: %@", task);
     NSAssert(task != nil, @"task should not be nil");
@@ -104,7 +135,7 @@ HLTPaymentTaskDelegate
     }
     task.delegate = self;
     [self.tasks addObject:task];// 添加到队列末
-    [self.queue addOperation:task];// 任务调度 suspended
+    [self.taskQueue addOperation:task];// 任务调度 suspended
     
     [self checkAbnormalTask];
 }
@@ -774,6 +805,9 @@ HLTPaymentTaskDelegate
 #pragma mark 辅助
 
 - (NSString *)createApplicationUsernameForTask:(HLTPaymentTask *)task {
+    if (self.doNotUseApplicationUsername) {
+        return nil;
+    }
     NSString *userId = (task.order.userIdentifier ?: @"");
     NSString *orderId = (task.order.orderId ?: @"");
     return [orderId stringByAppendingFormat:@",%@", userId];
@@ -786,37 +820,10 @@ HLTPaymentTaskDelegate
         return nil;
     }
     
-    
     NSArray *parts = [applicationUsername componentsSeparatedByString:@","];
     return @{HLTTransactionUserIdKey: parts.lastObject,
              HLTTransactionOrderIdKey: parts.firstObject
     };
-}
-
-#pragma mark - SKRequestDelegate
-
-- (void)requestDidFinish:(SKRequest *)request {
-    if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
-        // ⚠️凭据已刷新
-    }
-}
-
-- (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
-    if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
-        // ⚠️凭据刷新失败
-    }
-}
-
-#pragma mark -
-
-- (void)refreshPaymentReceipts {
-    SKReceiptRefreshRequest *request = [[SKReceiptRefreshRequest alloc] initWithReceiptProperties:@{}];
-    request.delegate = self;
-    [request start];
-}
-
-- (void)restoreCompletedTransactions {
-    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
 @end

@@ -23,11 +23,20 @@ extern NSString * const HLTReceiveTransactionOrderKey;
 
 + (instancetype)defaultQueue;
 
+- (void)setTaskConcurrentCount:(NSInteger)count;
+- (void)disableApplicationUsername;
+
+#pragma mark -
+
 /**
  添加 支付任务
  @param task 支付任务
  */
 - (void)addPaymentTask:(HLTPaymentTask *)task;
+
+/// 添加 信息同步任务
+/// @param task 任务
+- (void)addFetchTask:(NSOperation *)task;
 
 /**
  订单是否在支付任务中
@@ -35,7 +44,8 @@ extern NSString * const HLTReceiveTransactionOrderKey;
  @param order 订单
  @return 是否支付任务中
  */
-- (BOOL)isPaymentOrderInTask:(HLTOrderModel *)order;
+- (BOOL)isOrderAlreadyInTask:(HLTOrderModel *)order;
+
 
 /**
  结束 支付任务流程
@@ -43,9 +53,6 @@ extern NSString * const HLTReceiveTransactionOrderKey;
  */
 //- (void)finishPaymentTask:(HLTPaymentTask *)task;
 
-- (void)refreshPaymentReceipts;
-
-- (void)restoreCompletedTransactions;
 
 @end
 

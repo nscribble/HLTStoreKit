@@ -9,6 +9,7 @@
 #import "HLTStoreKitExample.h"
 #import <HLTStoreKit/HLTStoreKit-umbrella.h>
 #import "HLTNetwork.h"
+#import "HLTLocalReceiptVerifier.h"
 
 @implementation HLTStoreKitExample
 
@@ -28,9 +29,11 @@
     
     [[HLTStoreKit defaultStore] setOrderGenerator:[HLTOrderDefaultGenerator new]];
     //[[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderDefaultVerifier new]];
-    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderOnDeviceVerfier new]];
+    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTLocalReceiptVerifier new]];
     [[HLTStoreKit defaultStore] setOrderPersistence:[HLTOrderKeychainStore new]];
     [[HLTStoreKit defaultStore] startObservingTransaction];
+    
+    [HLTLocalReceiptVerifier injectCertificate:[[NSBundle mainBundle] URLForResource:@"StoreKitTest" withExtension:@"cer"]];
     
     // 清理异常数据 && 适配旧版数据
     [self clearInvalidOrders];
@@ -49,7 +52,7 @@
             [[HLTStoreKit defaultStore].orderPersistence removeOrder:obj];
         }
         else if (obj.orderStatus < HLTOrderStatusPurchased &&// 移到备份队列
-                 ![[HLTPaymentQueue defaultQueue] isPaymentOrderInTask:obj]) {
+                 ![[HLTPaymentQueue defaultQueue] isOrderAlreadyInTask:obj]) {
             [[HLTStoreKit defaultStore].orderPersistence storeBackupOrder:obj];
             [[HLTStoreKit defaultStore].orderPersistence removeOrder:obj];
         }
