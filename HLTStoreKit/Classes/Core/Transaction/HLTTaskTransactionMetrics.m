@@ -1,13 +1,13 @@
 //
-//  HLTTransactionMetrics.m
+//  HLTTaskTransactionMetrics.m
 //  HLTStoreKit
 //
 //  Created by Ryan on 2020/11/18.
 //
 
-#import "HLTTransactionMetrics.h"
+#import "HLTTaskTransactionMetrics.h"
 
-@interface HLTTransactionMetrics ()
+@interface HLTTaskTransactionMetrics ()
 
 @property (nonatomic, assign) NSInteger status;
 @property (nonatomic, assign) NSTimeInterval duration;
@@ -15,10 +15,10 @@
 
 @end
 
-@implementation HLTTransactionMetrics
+@implementation HLTTaskTransactionMetrics
 
 + (instancetype)metricWithTask:(HLTPaymentTask *)task {
-    HLTTransactionMetrics *metric = [self new];
+    HLTTaskTransactionMetrics *metric = [self new];
     
     return metric;
 }

@@ -80,16 +80,19 @@ SKRequestDelegate
                        }, @"[Task] Prefetch Invalid Products.IDs: %@", response.invalidProductIdentifiers);
     }
     
+    HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductSuccess,
+                   @"products": ([response.products valueForKeyPath:@"productIdentifier"] ?: @"")
+                 }, @"SKProduct fetched");
     if (self.completion) {
         self.completion(response.products, nil);
     }
-    [self finishTask];
+    //[self finishTask];
 }
 
 
 - (void)requestDidFinish:(SKRequest *)request {
     HLTLog(@"[Task] Prefetch Products Finished : %@", request);
-    //[self finishTask];
+    [self finishTask];
 }
 
 /// The requestDidFinish: method is not called after this method is called.

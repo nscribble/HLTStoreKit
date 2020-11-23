@@ -54,6 +54,10 @@ extern NSString * const HLTLogErrCodeKey;
 /// @param identifier 商品id
 - (SKProduct *)productForIdentifier:(NSString *)identifier;
 
+/// 预获取商品信息
+/// @param productIdentifiers 商品id列表
+- (void)prefetchProducts:(NSArray<NSString *> *)productIdentifiers;
+
 /// 获取商品信息
 /// @note 可以预获取商品信息
 /// @param productIdentifiers 商品id列表

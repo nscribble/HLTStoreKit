@@ -9,6 +9,7 @@
 #import "HLTPaymentTask.h"
 #import "HLTRetrievalTask.h"
 #import "HLTJailbreakDetect.h"
+#import "HLTTaskTransactionMetrics.h"
 
 @import StoreKit;
 
@@ -33,6 +34,9 @@ HLTPaymentTaskDelegate
 @property (nonatomic, strong) HLTPaymentTask *currentTask;
 // 队列中任务列表（为多task并发做支持，如果applicationUserName稳定可用）
 @property (nonatomic, strong) NSMutableArray<HLTPaymentTask *> *tasks;
+
+@property (nonatomic, strong) NSMutableDictionary<NSString *, HLTTaskTransactionMetrics *> *id2TaskMetrics;
+
 // (队列)启动时间
 @property (nonatomic, assign, readwrite) NSTimeInterval launchTime;
 
@@ -80,7 +84,7 @@ HLTPaymentTaskDelegate
         _fetchQueue.qualityOfService = NSQualityOfServiceUserInteractive;
     }
     
-    return _taskQueue;
+    return _fetchQueue;
 }
 
 - (NSMutableArray<HLTPaymentTask *> *)tasks {
@@ -89,6 +93,14 @@ HLTPaymentTaskDelegate
     }
     
     return _tasks;
+}
+
+- (NSMutableDictionary<NSString *,HLTTaskTransactionMetrics *> *)id2TaskMetrics {
+    if (!_id2TaskMetrics) {
+        _id2TaskMetrics = [NSMutableDictionary dictionary];
+    }
+    
+    return _id2TaskMetrics;
 }
 
 #pragma mark - Public
@@ -286,22 +298,29 @@ HLTPaymentTaskDelegate
 - (void)taskWillStart:(HLTPaymentTask *)task {// todo: 回调队列
     HLTLog(@"[Payment] taskWillStart: %@", task);
     self.currentTask = task;
+    [[self metricsForPaymentTask:task] setTaskStartDate:[NSDate now]];
 }
 
 - (void)taskWillFetchProductInfo:(HLTPaymentTask *)task {
     HLTLog(@"[Payment] taskWillFetchProductInfo: %@", task);
+    [[self metricsForPaymentTask:task] setFetchStartDate:[NSDate now]];
 }
 
 - (void)taskDidFetchProductInfo:(HLTPaymentTask *)task {
+    [[self metricsForPaymentTask:task] setFetchFinishDate:[NSDate now]];
 }
 
 - (void)taskWillCreateOrder:(HLTPaymentTask *)task {
+    [[self metricsForPaymentTask:task] setOrderStartDate:[NSDate now]];
 }
 
 - (void)taskCreateOrderFailed:(HLTPaymentTask *)task {
+    [[self metricsForPaymentTask:task] setOrderFinishDate:nil];
 }
 
 - (void)taskCreateOrderSuccess:(HLTPaymentTask *)task {
+    [[self metricsForPaymentTask:task] setOrderFinishDate:[NSDate date]];
+    
     // 订单持久化（订单创建成功前不记录）
     [self.orderPersistence storeOrder:task.order];
     
@@ -320,17 +339,22 @@ HLTPaymentTaskDelegate
 
 - (void)taskWillVerifyOrder:(HLTPaymentTask *)task {
     [self.orderPersistence storeOrder:task.order];
+    
+    [[self metricsForPaymentTask:task] setVerifyStartDate:[NSDate date]];
 }
 
 - (void)taskVerifyOrderFailed:(HLTPaymentTask *)task {
     [self.orderPersistence storeBackupOrder:task.order];// todo: 验证订单失败放到其他队列
     [self.orderPersistence removeOrder:task.order];
+    
+    [[self metricsForPaymentTask:task] setVerifyFinishDate:nil];
 }
 
 - (void)taskVerifyOrderSuccess:(HLTPaymentTask *)task {
     [self.orderPersistence removeOrder:task.order];
     
     // todo: 是否需要记录成功交易的备份？
+    [[self metricsForPaymentTask:task] setVerifyFinishDate:[NSDate date]];
 }
 
 - (void)taskDidFinish:(HLTPaymentTask *)task {
@@ -342,6 +366,8 @@ HLTPaymentTaskDelegate
         self.currentTask = nil;
     }
     [self.tasks removeObject:task];
+    
+    [[self metricsForPaymentTask:task] setTaskFinishDate:[NSDate date]];
 }
 
 - (void)taskDidCancel:(HLTPaymentTask *)task {
@@ -412,8 +438,8 @@ HLTPaymentTaskDelegate
         order = [self searchPotentialOrderWithProductId:productId];
     }
     
-    if (!order) {// 即时拯救 todo: 用户未登录不做处理？&& orderId
-        HLTLogParams(@{HLTLogEventKey: kLogEvent_OrderNotFound}, @"[Payment] Transaction order lost: %@|%@", productId, orderId);
+    if (!order) {// 即时拯救
+        HLTLogParams(@{HLTLogEventKey: kLogEvent_OrderNotFound}, @"[Payment] Transaction order not found: %@|%@", productId, orderId);
         NSString *productId = transaction.payment.productIdentifier;
         order = [[HLTOrderModel alloc] initWithProductId:productId];
         order.orderId = orderId;
@@ -800,6 +826,36 @@ HLTPaymentTaskDelegate
     else if (order.orderStatus >= HLTOrderStatusPurchased) {
         order.hint = @"可能是receipt验证过程中断";
     }
+}
+
+#pragma mark Metrics
+
+- (HLTTaskTransactionMetrics *)metricsForPaymentTask:(HLTPaymentTask *)task {
+    if (!task.taskId) {
+        return nil;
+    }
+    
+    HLTTaskTransactionMetrics *metrics = self.id2TaskMetrics[task.taskId];
+    if (metrics) {
+        return metrics;
+    }
+    
+    metrics = [HLTTaskTransactionMetrics metricWithTask:task];
+    if (metrics) {
+        self.id2TaskMetrics[task.taskId] = metrics;
+    }
+    
+    return metrics;
+}
+
+- (void)removeMetricsForTask:(HLTPaymentTask *)task {
+    if (task.taskId) {
+        [self.id2TaskMetrics removeObjectForKey:task.taskId];
+    }
+}
+
+- (void)flushMetrics {
+    [self.id2TaskMetrics removeAllObjects];
 }
 
 #pragma mark 辅助

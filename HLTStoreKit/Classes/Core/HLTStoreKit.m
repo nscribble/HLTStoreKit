@@ -22,6 +22,8 @@ HLTAppleProductProvider
 
 @property (nonatomic, strong) NSMutableDictionary<NSString *, SKProduct *> *id2Products;
 
+@property (nonatomic, strong) NSMutableArray<HLTProductRequestCompletion> *fetchCallbacks;
+
 /**
  默认配置
  @note 默认配置了NSLog输出日志，配置了订单创建逻辑等。
@@ -65,6 +67,14 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     }
     
     return _id2Products;
+}
+
+- (NSMutableArray<HLTProductRequestCompletion> *)fetchCallbacks {
+    if (!_fetchCallbacks) {
+        _fetchCallbacks = [NSMutableArray array];
+    }
+    
+    return _fetchCallbacks;
 }
 
 #pragma mark -
@@ -154,18 +164,25 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     return self.id2Products[identifier];
 }
 
+- (void)prefetchProducts:(NSArray<NSString *> *)productIdentifiers {
+    [self fetchProducts:productIdentifiers completion:NULL];
+}
+
 /// 预获取商品信息
 /// @param productIdentifiers 商品id列表
 - (void)fetchProducts:(NSArray<NSString *> *)productIdentifiers
            completion:(HLTProductRequestCompletion)completion {
     if (productIdentifiers.count <= 0) {
         HLTLog(@"productIds.count = 0");
+        !completion ?: completion(nil, nil);
         return;
     }
     
+    NSMutableArray *matched = [NSMutableArray array];
     NSMutableArray *filtered = [NSMutableArray array];
     [productIdentifiers enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if (self.id2Products[obj]) {
+            [matched addObject:self.id2Products[obj]];
             return;
         }
         
@@ -174,7 +191,15 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     
     if (filtered.count <= 0) {
         HLTLog(@"filtered productIds.count = 0");
+        !completion ?: completion(matched, nil);
         return;
+    }
+    
+    // 暂存 callbacks
+    if (completion) {
+        NSMutableArray *callbacks = [self.fetchCallbacks mutableCopy];
+        [callbacks addObject:completion];
+        self.fetchCallbacks = callbacks;
     }
     
     HLTPrefetchProductsTask *task = [[HLTPrefetchProductsTask alloc] initWithProductIdentifiers:productIdentifiers completion:^(NSArray<SKProduct *> *products, NSError *error) {
@@ -184,7 +209,9 @@ NSString * const HLTLogErrCodeKey = @"err_code";
             }];
         }
         
-        !completion ?: completion(products, error);
+        [self.fetchCallbacks enumerateObjectsUsingBlock:^(HLTProductRequestCompletion  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            obj(products, error);
+        }];
     }];
     
     [[HLTPaymentQueue defaultQueue] addFetchTask:task];

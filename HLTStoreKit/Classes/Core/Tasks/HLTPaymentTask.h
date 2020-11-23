@@ -50,6 +50,8 @@ typedef void(^HLTPaymentTaskBlock)(BOOL success);
     NSTimeInterval _startTime;
 }
 
+@property (nonatomic,copy,readonly) NSString *taskId;
+
 // 任务状态
 @property (nonatomic,assign) HLTTaskStatus   taskStatus;;
 // 事件代理

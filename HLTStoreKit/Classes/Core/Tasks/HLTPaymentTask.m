@@ -36,6 +36,7 @@ SKProductsRequestDelegate
 
 - (instancetype)initWithProductId:(NSString *)productId completion:(HLTPaymentCompletion)completion {
     if (self = [super init]) {
+        _taskId = [self.class createTaskIdString];
         _order = [[HLTOrderModel alloc] initWithProductId:productId];
         _completion = completion;
     }
@@ -49,6 +50,23 @@ SKProductsRequestDelegate
 
 - (NSString *)productId {
     return self.order.productId;
+}
+
++ (NSString *)createTaskIdString {
+    NSString *uuid = [self createUUIDString];
+    
+    NSString *requestId = [NSString stringWithFormat:@"%02i-%@", (arc4random() % 1000), uuid];
+    
+    return requestId;
+}
+
++ (NSString *)createUUIDString {
+    CFUUIDRef uuidRef = CFUUIDCreate(kCFAllocatorDefault);
+    CFStringRef uuidString = CFUUIDCreateString(kCFAllocatorDefault, uuidRef);
+    NSString *uuid = [NSString stringWithString:(__bridge NSString *)uuidString];
+    CFRelease(uuidString);
+    CFRelease(uuidRef);
+    return uuid;
 }
 
 #pragma mark - Operation Override
@@ -130,6 +148,11 @@ SKProductsRequestDelegate
         [self.delegate taskWillStart:self];
     }
     
+    // 查询商品信息
+    if ([self.delegate respondsToSelector:@selector(taskWillFetchProductInfo:)]) {
+        [self.delegate taskWillFetchProductInfo:self];
+    }
+    
     NSAssert(self.productProvider != nil, @"productProvider is required when create a payment task");
     __weak typeof(self) ws = self;
     [self.productProvider fetchProductOfIdentifier:self.productId completion:^(SKProduct * _Nullable product, NSError * _Nullable error) {
@@ -150,7 +173,8 @@ SKProductsRequestDelegate
     }
     
     // =>创建订单
-    HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductSuccess}, @"SKProduct fetched");
+    //HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductSuccess}, @"SKProduct fetched");
+    HLTLog(@"SKProduct fetched: %@", product.productIdentifier);
     self.skProduct = product;
     if ([self.delegate respondsToSelector:@selector(taskDidFetchProductInfo:)]) {
         [self.delegate taskDidFetchProductInfo:self];

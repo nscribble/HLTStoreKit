@@ -22,9 +22,11 @@
     }
   ],
   "settings" : {
+    "_failTransactionsEnabled" : false,
     "_locale" : "zh_CN",
     "_storefront" : "CHN",
-    "_timeRate" : 4
+    "_storeKitError" : 0,
+    "_timeRate" : 6
   },
   "subscriptionGroups" : [
     {
@@ -43,7 +45,7 @@
           "groupNumber" : 1,
           "internalID" : "244EC519",
           "introductoryOffer" : {
-            "internalID" : "1AC8061D",
+            "internalID" : "152D212D",
             "paymentMode" : "free",
             "subscriptionPeriod" : "P3D"
           },

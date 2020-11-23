@@ -38,7 +38,7 @@
 }
 
 - (void)initConfiguration {
-    
+    [[HLTStoreKit defaultStore] prefetchProducts:@[@"com.moment.coins12", @"com.moment.vip1"]];
 }
 
 - (void)onTapBtn:(UIButton *)button {

@@ -45,7 +45,6 @@
 + (void)clearInvalidOrders {
     NSArray<HLTOrderModel *> *orders =
     [[HLTStoreKit defaultStore].orderPersistence getPendingOrderList];
-    HLTLog(@"PendingOrderList: %@", orders);
     
     [orders enumerateObjectsUsingBlock:^(HLTOrderModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if (obj.orderStatus < HLTOrderStatusPurchasing) {// 无效订单
