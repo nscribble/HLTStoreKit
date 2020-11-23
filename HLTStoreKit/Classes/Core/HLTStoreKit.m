@@ -226,6 +226,7 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     }];
     task.orderGenerator = self.orderGenerator;
     task.orderVerifier = self.orderVerifier;
+    task.productProvider = self;
     
     [[HLTPaymentQueue defaultQueue] addPaymentTask:task];
 }

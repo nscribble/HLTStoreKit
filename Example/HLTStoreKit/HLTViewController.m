@@ -47,11 +47,12 @@
     productId = @"com.moment.vip1";
 //    productId = @"com.moment.svip1";
         
-//    [[HLTStoreKit defaultStore] purchase:productId configuration:^(id<HLTOrderConfiguration> configuration) {
-//    } completion:^(NSString *productId, NSString *orderId, NSError *error) {
-//    }];
+    [[HLTStoreKit defaultStore] purchase:productId configuration:^(id<HLTOrderConfiguration> configuration) {
+    } completion:^(NSString *productId, NSString *orderId, NSError *error) {
+    }];
     
-    [[HLTStoreKit defaultStore] refreshPaymentReceipts:NULL];
+    //[[HLTStoreKit defaultStore] refreshPaymentReceipts:NULL];
+//    [[HLTStoreKit defaultStore] restoreTransactions];
     
     NSArray *tids = [[[RMAppReceipt bundleReceipt] inAppPurchases] valueForKeyPath:@"transactionIdentifier"];
     HLTLog(@"tids: %@", tids);
