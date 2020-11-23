@@ -298,20 +298,20 @@ HLTPaymentTaskDelegate
 - (void)taskWillStart:(HLTPaymentTask *)task {// todo: 回调队列
     HLTLog(@"[Payment] taskWillStart: %@", task);
     self.currentTask = task;
-    [[self metricsForPaymentTask:task] setTaskStartDate:[NSDate now]];
+    [[self metricsForPaymentTask:task] setTaskStartDate:[NSDate date]];
 }
 
 - (void)taskWillFetchProductInfo:(HLTPaymentTask *)task {
     HLTLog(@"[Payment] taskWillFetchProductInfo: %@", task);
-    [[self metricsForPaymentTask:task] setFetchStartDate:[NSDate now]];
+    [[self metricsForPaymentTask:task] setFetchStartDate:[NSDate date]];
 }
 
 - (void)taskDidFetchProductInfo:(HLTPaymentTask *)task {
-    [[self metricsForPaymentTask:task] setFetchFinishDate:[NSDate now]];
+    [[self metricsForPaymentTask:task] setFetchFinishDate:[NSDate date]];
 }
 
 - (void)taskWillCreateOrder:(HLTPaymentTask *)task {
-    [[self metricsForPaymentTask:task] setOrderStartDate:[NSDate now]];
+    [[self metricsForPaymentTask:task] setOrderStartDate:[NSDate date]];
 }
 
 - (void)taskCreateOrderFailed:(HLTPaymentTask *)task {
