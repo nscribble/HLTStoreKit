@@ -139,7 +139,7 @@ SKProductsRequestDelegate
 
 - (void)onFetchedProduct:(SKProduct *)product error:(NSError *)error {
     if (!product) {
-        HLTLogParams(@{HLTLogEventKey: (error ? kLogEvent_SKProductFailed : kLogEvent_SKProductNotFound)
+        HLTLogParams(@{HLTLogEventKey: (error ? kLogEvent_SKProductFailed : kLogEvent_SKProductNotFound),
                        HLTLogErrorKey: (error ?: @"errorNil"),
                        @"productId": (self.productId ?: @"productIdNil"),
                      }, @"SKProduct Failed/NotFound for (%@)", self.productId);
