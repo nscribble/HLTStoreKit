@@ -305,8 +305,8 @@ SKProductsRequestDelegate
     }
     
     __weak typeof(self) weakSelf = self;
-    [self.orderVerifier verifyOrder:self.order success:^(HLTOrderModel *order) {
-        [weakSelf processOnOrderVerified];
+    [self.orderVerifier verifyOrder:self.order success:^(HLTOrderModel *order, NSDictionary *respObject) {
+        [weakSelf processOnOrderVerified:respObject];
     } failure:^(NSError *error) {
         [weakSelf failedOnVerifyingOrder:error];
     }];
@@ -316,7 +316,11 @@ SKProductsRequestDelegate
     HLTLogParams(@{HLTLogEventKey: kLogEvent_VerifyFailed,
                    HLTLogErrorKey: (error ?: @"errorNil"),
                    @"orderId": (self.order.orderId ?: @"orderIdNil"),
+                   @"productId": (self.order.productId ?: (self.order.skTransaction.payment.productIdentifier ?: @"")),
+                   @"tId": (self.order.transactionIdentifier ?: @""),
+                   @"applicationUsername": (self.order.skTransaction.payment.applicationUsername ?: @"")
                    }, @"[Payment] order(%@) verifying failed: %@", self.order, error);
+    
     self.order.orderStatus = HLTOrderStatusReceiptFailed;
     self.order.receiptVerifyCount += 1;
     if ([self.delegate respondsToSelector:@selector(taskVerifyOrderFailed:)]) {
@@ -328,11 +332,19 @@ SKProductsRequestDelegate
     [self callBackWithFatalError:[err errorWithUnderlying:error]];
 }
 
-- (void)processOnOrderVerified {
+- (void)processOnOrderVerified:(NSDictionary *)responseObject {
     HLTLog(@"[Payment] order verified: %@", self.order);
-    HLTLogParams(@{HLTLogEventKey: kLogEvent_VerifySuccess,
-                   @"orderId": (self.order.orderId ?: @"orderIdNil")
-                   }, @"[Payment] order verified: %@", self.order);
+    NSMutableDictionary *params = @{HLTLogEventKey: kLogEvent_VerifySuccess,
+                             @"orderId": (self.order.orderId ?: @"orderIdNil"),
+                             @"productId": (self.order.productId ?: (self.order.skTransaction.payment.productIdentifier ?: @"")),
+                             @"tId": (self.order.transactionIdentifier ?: @""),
+                             @"applicationUsername": (self.order.skTransaction.payment.applicationUsername ?: @""),
+    }.mutableCopy;
+    if (responseObject) {
+        [params addEntriesFromDictionary:responseObject];
+    }
+    HLTLogParams(params, @"[Payment] order verified: %@", self.order);
+    
     self.order.orderStatus = HLTOrderStatusReceiptVerified;
     self.order.receiptVerifyCount += 1;
     if ([self.delegate respondsToSelector:@selector(taskVerifyOrderSuccess:)]) {

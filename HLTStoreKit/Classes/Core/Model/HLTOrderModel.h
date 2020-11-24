@@ -49,6 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isEqualToOrder:(HLTOrderModel *)other;
 
+- (NSString * _Nullable)transactionIdentifier;
+
+#pragma mark -
+
 - (void)updateWithSKPaymentTransaction:(SKPaymentTransaction *)skTransaction;
 - (void)updateWithTransaction:(HLTOrderTransaction *)transaction;
 

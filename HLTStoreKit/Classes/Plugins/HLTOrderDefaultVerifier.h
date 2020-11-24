@@ -26,6 +26,7 @@ typedef void(^HLTOrderVerifyProcessingBlock)(HLTOrderVerifierReq *request, HLTOr
 @interface HLTOrderVerifierReq : NSObject
 
 @property (nonatomic,strong,readonly) HLTOrderModel *order;
+@property (nonatomic,strong) NSDictionary *responseObject;
 
 @end
 

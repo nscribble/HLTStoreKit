@@ -126,8 +126,12 @@ typedef NS_ENUM(NSInteger, HLTOrderSource) {
 // 订单校验（本地）
 @protocol HLTOrderVerifier <NSObject>
 
+/// 校验订单凭据
+/// @param order 订单
+/// @param successBlock 成功回调（注：respObject会被log）
+/// @param failureBlock 失败回调
 - (void)verifyOrder:(HLTOrderModel *)order
-            success:(void (^)(HLTOrderModel *order))successBlock
+            success:(void (^)(HLTOrderModel *order, NSDictionary *respObject))successBlock
             failure:(void (^)(NSError *error))failureBlock;
 
 @end

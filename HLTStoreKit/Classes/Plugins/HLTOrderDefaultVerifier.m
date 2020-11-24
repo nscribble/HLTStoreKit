@@ -161,13 +161,13 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
     return _requests;
 }
 
-- (void)verifyOrder:(HLTOrderModel *)order success:(void (^)(HLTOrderModel *))successBlock failure:(void (^)(NSError *))failureBlock {
+- (void)verifyOrder:(HLTOrderModel *)order success:(void (^)(HLTOrderModel *, NSDictionary *respObject))successBlock failure:(void (^)(NSError *))failureBlock {
     __weak typeof(self) weakSelf = self;
     HLTOrderVerifierReq *req = [[HLTOrderVerifierReq alloc] initWithOrder:order completion:^(HLTOrderVerifierReq * _Nonnull request, BOOL success, NSError * _Nullable error) {
         if (!success || error) {
             !failureBlock ?: failureBlock(error);
         } else {
-            !successBlock ?: successBlock(order);
+            !successBlock ?: successBlock(order, request.responseObject);
         }
         
         [weakSelf.requests removeObject:request];

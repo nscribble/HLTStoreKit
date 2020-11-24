@@ -122,6 +122,10 @@
 
 #pragma mark - Public
 
+- (NSString *)transactionIdentifier {
+    return self.skTransaction.transactionIdentifier ?: self.transaction.transactionIdentifier;
+}
+
 - (BOOL)isOrderIdValid {
     return self.orderId != nil && self.orderId.length > 0 && ![self.orderId hasPrefix:@"temp"];
 }
