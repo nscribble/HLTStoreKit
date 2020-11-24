@@ -109,6 +109,9 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
 }
 
 - (BOOL)shouldRetryVerifying:(NSError *)error {
+    if (self.dontRetry) {
+        return NO;
+    }
     if (self.reqStatus == HLTVerifyReqStatusFinished) {
         return NO;
     }

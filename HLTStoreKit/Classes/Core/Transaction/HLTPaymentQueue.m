@@ -876,6 +876,25 @@ HLTPaymentTaskDelegate
         return nil;
     }
     
+    /*{ 兼容旧版*/
+    NSError  *error;
+    NSDictionary *oldReceiptInfo = [NSJSONSerialization JSONObjectWithData: options:NSJSONReadingAllowFragments|NSJSONReadingMutableContainers error:&error];
+    if (error) {
+        GZHTLog(@"receipt -> json error: %@", error);
+    }
+    
+    NSError *error;
+    NSData *jsonData = [applicationUsername dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *json =
+    [NSJSONSerialization JSONObjectWithData:jsonData
+                                    options:NSJSONReadingMutableLeaves|NSJSONReadingAllowFragments
+                                      error:&error];
+    if (!error && json) {
+        return json;
+    }
+    
+    /*}*/
+    
     NSArray *parts = [applicationUsername componentsSeparatedByString:@","];
     return @{HLTTransactionUserIdKey: parts.lastObject,
              HLTTransactionOrderIdKey: parts.firstObject
