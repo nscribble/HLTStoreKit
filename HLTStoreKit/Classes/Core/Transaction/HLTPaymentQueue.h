@@ -38,6 +38,8 @@ extern NSString * const HLTReceiveTransactionOrderKey;
 /// @param task 任务
 - (void)addFetchTask:(NSOperation *)task;
 
+#pragma mark
+
 /**
  订单是否在支付任务中
 
@@ -46,6 +48,7 @@ extern NSString * const HLTReceiveTransactionOrderKey;
  */
 - (BOOL)isOrderAlreadyInTask:(HLTOrderModel *)order;
 
+- (NSArray<HLTPaymentTask *> *)paymentTasksOnGoing;
 
 /**
  结束 支付任务流程

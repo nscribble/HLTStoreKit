@@ -167,8 +167,9 @@ SKProductsRequestDelegate
                        @"productId": (self.productId ?: @"productIdNil"),
                      }, @"SKProduct Failed/NotFound for (%@)", self.productId);
         
-        [self callBackWithErrCode:HLTPaymentErrorProductInvalid
-                      description:@"产品ID无效（App Store）"];
+        NSError *err = [self ht_storeKitErrorWithCode:HLTPaymentErrorProductInvalid
+                                          description:@"产品ID无效（App Store）"];
+        [self callBackWithFatalError:[err errorWithUnderlying:error]];
         return;
     }
     

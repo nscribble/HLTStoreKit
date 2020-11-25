@@ -88,6 +88,10 @@ NSString * const HLTLogErrCodeKey = @"err_code";
         va_end(args);
         NSLog(@"%@", message);
     }];
+    
+#if DEBUG
+    [[HLTPaymentQueue defaultQueue] setTaskConcurrentCount:3];
+#endif
 }
 
 - (void)addNotificationObservers {

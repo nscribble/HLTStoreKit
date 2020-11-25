@@ -32,8 +32,9 @@ HLTPaymentTaskDelegate
 @property (nonatomic, strong) NSOperationQueue *fetchQueue;
 // 当前任务
 @property (nonatomic, strong) HLTPaymentTask *currentTask;
-// 队列中任务列表（为多task并发做支持，如果applicationUserName稳定可用）
+// 队列中任务列表（所有）
 @property (nonatomic, strong) NSMutableArray<HLTPaymentTask *> *tasks;
+@property (nonatomic, strong) NSMutableArray<HLTPaymentTask *> *onGoingTasks;
 
 @property (nonatomic, strong) NSMutableDictionary<NSString *, HLTTaskTransactionMetrics *> *id2TaskMetrics;
 
@@ -95,6 +96,14 @@ HLTPaymentTaskDelegate
     return _tasks;
 }
 
+- (NSMutableArray<HLTPaymentTask *> *)onGoingTasks {
+    if (!_onGoingTasks) {
+        _onGoingTasks = [NSMutableArray<HLTPaymentTask *> array];
+    }
+    
+    return _onGoingTasks;
+}
+
 - (NSMutableDictionary<NSString *,HLTTaskTransactionMetrics *> *)id2TaskMetrics {
     if (!_id2TaskMetrics) {
         _id2TaskMetrics = [NSMutableDictionary dictionary];
@@ -115,6 +124,10 @@ HLTPaymentTaskDelegate
 }
 
 #pragma mark -
+
+- (NSArray<HLTPaymentTask *> *)paymentTasksOnGoing {
+    return self.taskQueue.operations;
+}
 
 - (BOOL)isOrderAlreadyInTask:(HLTOrderModel *)order {
     if (!order) {
@@ -211,10 +224,12 @@ HLTPaymentTaskDelegate
     for (SKPaymentTransaction *transaction in transactions) {
         HLTLogParams(@{HLTLogEventKey: kLogEvent_SKTransaction_Update,
                        @"transactionState": @(transaction.transactionState),
-                       @"transactionIdentifier": (transaction.transactionIdentifier ?: @""),
-                       @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
+                       @"tId": (transaction.transactionIdentifier ?: @""),
+                       @"productId": (transaction.payment.productIdentifier ?: @""),
                        @"applicationUsername": (transaction.payment.applicationUsername ?: @""),
-                       }, @"[Transaction] update: %@", [self __stringTransactionState:transaction.transactionState]);
+                       @"rcpt": ([self base64ReceiptsForTransaction:transaction] ?: @"")
+                     }, @"[Transaction] update: %@", [self __stringTransactionState:transaction.transactionState]);
+        
         switch (transaction.transactionState) {
             case SKPaymentTransactionStatePurchasing:
                 [self didPurchasingTransactions:transaction queue:queue];
@@ -270,6 +285,16 @@ HLTPaymentTaskDelegate
     return desc;
 }
 
+- (NSString *)base64ReceiptsForTransaction:(SKPaymentTransaction *)transaction {
+    NSData *receipt = transaction.transactionReceipt;
+    if (receipt) {
+        NSString *receiptString = [receipt base64EncodedStringWithOptions:0];
+        return receiptString;
+    }
+    
+    return nil;
+}
+
 /* {
  // Tells an observer that one or more transactions have been removed from the queue.
  //- (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
@@ -298,6 +323,7 @@ HLTPaymentTaskDelegate
 - (void)taskWillStart:(HLTPaymentTask *)task {// todo: 回调队列
     HLTLog(@"[Payment] taskWillStart: %@", task);
     self.currentTask = task;
+    [self.onGoingTasks addObject:task];
     [[self metricsForPaymentTask:task] setTaskStartDate:[NSDate date]];
 }
 
@@ -353,7 +379,6 @@ HLTPaymentTaskDelegate
 - (void)taskVerifyOrderSuccess:(HLTPaymentTask *)task {
     [self.orderPersistence removeOrder:task.order];
     
-    // todo: 是否需要记录成功交易的备份？
     [[self metricsForPaymentTask:task] setVerifyFinishDate:[NSDate date]];
 }
 
@@ -366,6 +391,7 @@ HLTPaymentTaskDelegate
         self.currentTask = nil;
     }
     [self.tasks removeObject:task];
+    [self.onGoingTasks removeObject:task];
     
     [[self metricsForPaymentTask:task] setTaskFinishDate:[NSDate date]];
 }
@@ -379,6 +405,7 @@ HLTPaymentTaskDelegate
         self.currentTask = nil;
     }
     [self.tasks removeObject:task];
+    [self.onGoingTasks removeObject:task];
 }
 
 #pragma mark -

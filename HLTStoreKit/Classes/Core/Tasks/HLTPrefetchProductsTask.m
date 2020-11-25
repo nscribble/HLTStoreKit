@@ -11,7 +11,8 @@
 
 @interface HLTPrefetchProductsTask ()
 <
-SKRequestDelegate
+SKRequestDelegate,
+SKProductsRequestDelegate
 >
 
 @property (nonatomic, copy) NSArray<NSString *> *productIdentifiers;
@@ -81,7 +82,7 @@ SKRequestDelegate
     }
     
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductSuccess,
-                   @"products": ([response.products valueForKeyPath:@"productIdentifier"] ?: @"")
+                   @"productId": ([[response.products valueForKeyPath:@"productIdentifier"] componentsJoinedByString:@","] ?: @"")
                  }, @"SKProduct fetched");
     if (self.completion) {
         self.completion(response.products, nil);

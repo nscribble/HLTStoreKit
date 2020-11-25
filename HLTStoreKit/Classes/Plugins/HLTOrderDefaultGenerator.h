@@ -31,6 +31,8 @@ typedef void(^HLTOrderGenReqProcessingBlock)(HLTOrderGeneratorReq *request, HLTO
 @property (nonatomic, copy, readonly) NSString *productId;
 @property (nonatomic,strong,readonly) HLTOrderModel *voidOrder;
 
+@property (nonatomic, strong) NSDictionary *responseObject;
+
 @end
 
 NS_ASSUME_NONNULL_END

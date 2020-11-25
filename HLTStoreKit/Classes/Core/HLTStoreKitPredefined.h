@@ -66,7 +66,7 @@ typedef NS_ENUM(NSInteger, HLTPaymentErrorCode) {
     HLTPaymentErrorNone,
     HLTPaymentErrorNoNetwork,
     HLTPaymentErrorCanNotMakePayment,
-    HLTPaymentErrorProductIdInvalid,
+    HLTPaymentErrorProductIdInvalid,// 请使用`HLTPaymentErrorProductInvalid`
     HLTPaymentErrorProductInvalid,
     HLTPaymentErrorProductNotFound,
     HLTPaymentErrorCreateOrderFailed,
