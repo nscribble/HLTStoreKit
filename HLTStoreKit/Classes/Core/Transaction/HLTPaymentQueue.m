@@ -905,12 +905,6 @@ HLTPaymentTaskDelegate
     
     /*{ 兼容旧版*/
     NSError  *error;
-    NSDictionary *oldReceiptInfo = [NSJSONSerialization JSONObjectWithData: options:NSJSONReadingAllowFragments|NSJSONReadingMutableContainers error:&error];
-    if (error) {
-        GZHTLog(@"receipt -> json error: %@", error);
-    }
-    
-    NSError *error;
     NSData *jsonData = [applicationUsername dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *json =
     [NSJSONSerialization JSONObjectWithData:jsonData
