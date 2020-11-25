@@ -225,8 +225,11 @@ SKProductsRequestDelegate
     self.order.orderStatus = HLTOrderStatusPurchaseFailed;
     [self.order updateWithSKPaymentTransaction:transaction];
     
-    [self callBackWithErrCode:HLTPaymentErrorIAPTransactionFailed
-                  description:@"应用内购买失败"];
+    NSError *err =
+    [self ht_storeKitErrorWithCode:HLTPaymentErrorIAPTransactionFailed
+                       description:@"应用内购买失败"];
+    
+    [self callBackWithFatalError:[err errorWithUnderlying:transaction.error]];
 }
 
 #pragma mark - Ordering Procedure
@@ -363,7 +366,7 @@ SKProductsRequestDelegate
 }
 
 - (void)callBackWithFatalError:(NSError *)error {
-    HLTLog(@"[Task] payment failed: %@", error);
+    HLTLog(@"[Task] payment failed: %@(%@)", error, error.underlyingError);
     if (self.completion) {
         self.completion(self.productId, self.order.orderId, error);
     }
