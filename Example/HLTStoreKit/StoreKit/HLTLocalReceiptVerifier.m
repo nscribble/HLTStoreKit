@@ -31,17 +31,21 @@
     return _rm_verifier;
 }
 
-- (void)verifyOrder:(HLTOrderModel *)order success:(void (^)(HLTOrderModel * _Nonnull))successBlock failure:(void (^)(NSError * _Nonnull))failureBlock {
+- (void)verifyOrder:(HLTOrderModel *)order success:(void (^)(HLTOrderModel *, NSDictionary *))successBlock failure:(void (^)(NSError *))failureBlock {
     RMAppReceipt *rcpt = [RMAppReceipt bundleReceipt];
     HLTLog(@"rcpt: %@", rcpt);
     
     BOOL result = [self.rm_verifier verifyAppReceipt];
-    if (result) {
-        !successBlock ?: successBlock(order);
-    } else {
-        NSError *error = [NSError errorWithDomain:@"com.hltstore.error" code:-100 userInfo:@{NSLocalizedDescriptionKey: @"验证订单失败"}];
-        !failureBlock ?: failureBlock(error);
-    }
+    NSTimeInterval delay = arc4random() % 5 + 5;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (result) {
+            !successBlock ?: successBlock(order, nil);
+        } else {
+            NSError *error = [NSError errorWithDomain:@"com.hltstore.error" code:-100 userInfo:@{NSLocalizedDescriptionKey: @"验证订单失败"}];
+            !failureBlock ?: failureBlock(error);
+        }
+    });
 }
+
 
 @end

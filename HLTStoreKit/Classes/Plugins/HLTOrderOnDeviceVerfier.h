@@ -14,10 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *sharedCredential;
 
-- (void)verifyOrder:(HLTOrderModel *)order
-            success:(void (^)(HLTOrderModel *order))successBlock
-            failure:(void (^)(NSError *error))failureBlock;
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -55,7 +55,7 @@ SKProductsRequestDelegate
 + (NSString *)createTaskIdString {
     NSString *uuid = [self createUUIDString];
     
-    NSString *requestId = [NSString stringWithFormat:@"%02i-%@", (arc4random() % 1000), uuid];
+    NSString *requestId = [NSString stringWithFormat:@"%02i-%@", (arc4random() % 100), uuid];
     
     return requestId;
 }
@@ -82,8 +82,8 @@ SKProductsRequestDelegate
             return;
         }
         
-        [self startTask];
         self.executing = YES;
+        [self startTask];
     }
 }
 

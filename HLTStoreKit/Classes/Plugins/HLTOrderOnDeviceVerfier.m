@@ -15,7 +15,7 @@
 
 @implementation HLTOrderOnDeviceVerfier
 
-- (void)verifyOrder:(HLTOrderModel *)order success:(void (^)(HLTOrderModel * _Nonnull))successBlock failure:(void (^)(NSError * _Nonnull))failureBlock {
+- (void)verifyOrder:(HLTOrderModel *)order success:(void (^)(HLTOrderModel *, NSDictionary *))successBlock failure:(void (^)(NSError *))failureBlock {
     SKPaymentTransaction *transaction = order.skTransaction;
     NSData *receiptData = transaction.transactionReceipt;
     NSURL *receiptURL = [[NSBundle mainBundle] appStoreReceiptURL];
@@ -40,7 +40,7 @@
     }
 }
 
-- (void)validateReceipt:(NSData *)httpBody order:(HLTOrderModel *)order success:(void (^)(HLTOrderModel * _Nonnull))successBlock failure:(void (^)(NSError * _Nonnull))failureBlock  {
+- (void)validateReceipt:(NSData *)httpBody order:(HLTOrderModel *)order success:(void (^)(HLTOrderModel * _Nonnull, NSDictionary *respObject))successBlock failure:(void (^)(NSError * _Nonnull))failureBlock  {
     NSURL *validateURL = [NSURL URLWithString:@"https://buy.itunes.apple.com/verifyReceipt"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:validateURL];
     request.HTTPMethod = @"POST";
@@ -63,7 +63,7 @@
         
         NSInteger status = [respObject[@"status"] integerValue];
         if (respObject && status == 0) {// success
-            !successBlock ?: successBlock(order);
+            !successBlock ?: successBlock(order, respObject);
         }
         else if (status == 21007) {// proceed to verify with the sandbox URL
             [self validateReceiptInSandbox:httpBody
@@ -83,7 +83,7 @@
     [task resume];
 }
 
-- (void)validateReceiptInSandbox:(NSData *)httpBody order:(HLTOrderModel *)order success:(void (^)(HLTOrderModel * _Nonnull))successBlock failure:(void (^)(NSError * _Nonnull))failureBlock  {
+- (void)validateReceiptInSandbox:(NSData *)httpBody order:(HLTOrderModel *)order success:(void (^)(HLTOrderModel * _Nonnull, NSDictionary *respObject))successBlock failure:(void (^)(NSError * _Nonnull))failureBlock  {
     NSURL *validateURL = [NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:validateURL];
     request.HTTPMethod = @"POST";
@@ -106,7 +106,7 @@
         
         NSInteger status = [respObject[@"status"] integerValue];
         if (respObject && status == 0) {// success
-            !successBlock ?: successBlock(order);
+            !successBlock ?: successBlock(order, respObject);
         } else {
             NSError *error = (error ?: jsonError);
             if (!error) {

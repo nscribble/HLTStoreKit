@@ -15,8 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)injectCertificate:(NSURL *)certURL;
 
-- (void)verifyOrder:(HLTOrderModel *)order success:(void (^)(HLTOrderModel *))successBlock failure:(void (^)(NSError *))failureBlock;
-
 @end
 
 NS_ASSUME_NONNULL_END
