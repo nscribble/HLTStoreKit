@@ -112,6 +112,10 @@ HLTPaymentTaskDelegate
     return _id2TaskMetrics;
 }
 
+//- (HLTPaymentTask *)currentTask {
+//    return self.onGoingTasks.lastObject;
+//}
+
 #pragma mark - Public
 
 - (void)setTaskConcurrentCount:(NSInteger)count {
@@ -126,7 +130,7 @@ HLTPaymentTaskDelegate
 #pragma mark -
 
 - (NSArray<HLTPaymentTask *> *)paymentTasksOnGoing {
-    return self.taskQueue.operations;
+    return self.onGoingTasks;
 }
 
 - (BOOL)isOrderAlreadyInTask:(HLTOrderModel *)order {
@@ -221,6 +225,7 @@ HLTPaymentTaskDelegate
 #pragma mark - SKPaymentTransactionObserver
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
+    HLTLog(@"updatedTransactions (%@)", @(transactions.count));
     for (SKPaymentTransaction *transaction in transactions) {
         HLTLogParams(@{HLTLogEventKey: kLogEvent_SKTransaction_Update,
                        @"transactionState": @(transaction.transactionState),
@@ -429,6 +434,7 @@ HLTPaymentTaskDelegate
                    @"transactionIdentifier": (transaction.transactionIdentifier ?: @""),
                    @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
                    @"orderId": (orderId ?: @"orderIdNil"),
+                   @"isJailbreak": @([HLTJailbreakDetect isJailbreak]),
                    }, @"[Transaction] didPurchased: [%@|%@] %@", transaction.payment.productIdentifier, transaction.payment.productIdentifier, (orderId ?: @"orderIdNil"));
     if (transaction.error != nil) {
         HLTLog(@"交易已失败，流程错误");
@@ -453,6 +459,16 @@ HLTPaymentTaskDelegate
                    }, @"[Transaction] No Task matched! Launch at: %@, now: %@, jailbreak: %@",  @(self.launchTime), @(now), @(isJailbreak));
     
     HLTOrderModel *order = nil;
+    if (transaction.originalTransaction) {
+        if (orderId.length <= 0) {
+            HLTOrderModel *potentialRelated = [self searchPotentialOrderWithProductId:productId];
+            orderId = potentialRelated.orderId;
+        }
+        order = [self _createOrderForRescue:transaction orderId:orderId];
+        [self continueOrder:order onTransactionPurchased:transaction];
+        return;
+    }
+    
     if (orderId) {//
         HLTLog(@"检查orderId匹配的订单（可信度高）");
         order = [self searchPendingOrderMatchingOrderId:orderId];
@@ -466,14 +482,7 @@ HLTPaymentTaskDelegate
     }
     
     if (!order) {// 即时拯救
-        HLTLogParams(@{HLTLogEventKey: kLogEvent_OrderNotFound}, @"[Payment] Transaction order not found: %@|%@", productId, orderId);
-        NSString *productId = transaction.payment.productIdentifier;
-        order = [[HLTOrderModel alloc] initWithProductId:productId];
-        order.orderId = orderId;
-        order.orderSource = HLTOrderSourceRescueOnSite;
-        order.userIdentifier = [self userIdFromTransaction:transaction];
-        
-        [self.orderPersistence storeOrder:order];
+        order = [self _createOrderForRescue:transaction orderId:orderId];
         HLTLog(@"[Transaction] Rescue On-Site: %@", order);
     }
     
@@ -509,15 +518,9 @@ HLTPaymentTaskDelegate
         }
     }
     
-    if (!order) {// 即时拯救 todo: 用户未登录不做处理？
+    if (!order) {// 即时拯救
         HLTLog(@"[Transaction] no order matching: %@", orderId);
-        NSString *productId = transaction.payment.productIdentifier;
-        order = [[HLTOrderModel alloc] initWithProductId:productId];
-        order.orderId = orderId;
-        order.orderSource = HLTOrderSourceRescueOnSite;
-        order.userIdentifier = [self userIdFromTransaction:transaction];
-        
-        [self.orderPersistence storeBackupOrder:order];
+        order = [self _createOrderForRescue:transaction orderId:orderId];
     }
     
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
@@ -525,11 +528,27 @@ HLTPaymentTaskDelegate
 }
 
 - (void)didRestoreTransaction:(SKPaymentTransaction *)transaction queue:(SKPaymentQueue*)queue {
-    
+    HLTLogParams(@{HLTLogEventKey: kLogEvent_SKPaymentRestore,
+                   @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
+                   @"isJailbreak": @([HLTJailbreakDetect isJailbreak]),
+                 }, @"[Payment] didRestoreTransaction");
 }
 
 - (void)didDeferTransaction:(SKPaymentTransaction *)transaction {
+    HLTLog(@"didDeferTransaction");
+}
+
+- (HLTOrderModel *)_createOrderForRescue:(SKPaymentTransaction *)transaction orderId:(NSString *)orderId {
+    HLTLogParams(@{HLTLogEventKey: kLogEvent_OrderNotFound, @"orderId": (orderId ?: @"")}, @"[Payment] Transaction order not found: %@|%@", transaction.payment.productIdentifier, orderId);
+    NSString *productId = transaction.payment.productIdentifier;
+    HLTOrderModel *order = [[HLTOrderModel alloc] initWithProductId:productId];
+    order.orderId = orderId;
+    order.orderSource = HLTOrderSourceRescueOnSite;
+    order.userIdentifier = [self userIdFromTransaction:transaction];
     
+    [self.orderPersistence storeOrder:order];
+    
+    return order;
 }
 
 #pragma mark - Private

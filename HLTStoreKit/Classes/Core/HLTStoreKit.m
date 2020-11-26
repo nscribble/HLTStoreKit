@@ -206,8 +206,8 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     
     if (filtered.count <= 0) {
         HLTLog(@"filtered productIds.count = 0");
-        !completion ?: completion(matched, nil);
-        return;
+//        !completion ?: completion(matched, nil);
+//        return;
     }
     
     // 暂存 callbacks
@@ -254,7 +254,34 @@ NSString * const HLTLogErrCodeKey = @"err_code";
         configuration(task);
     }
     
+    HLTPaymentTask *ongoingTask = [self ongoingPaymentTaskForProductId:productId];
+    if (ongoingTask) {
+        NSString *desc = ongoingTask.skProduct.localizedTitle;
+        if (self.confirmOnGoingTask) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.confirmOnGoingTask(productId, desc, ^(BOOL confirmed) {
+                    if (confirmed) {
+                        [[HLTPaymentQueue defaultQueue] addPaymentTask:task];
+                    }
+                });
+            });
+            return;
+        }
+    }
+    
     [[HLTPaymentQueue defaultQueue] addPaymentTask:task];
+}
+
+- (HLTPaymentTask *)ongoingPaymentTaskForProductId:(NSString *)productId {
+    NSArray<HLTPaymentTask *> *paymentTasks = [[HLTPaymentQueue defaultQueue] paymentTasksOnGoing];
+    paymentTasks = [paymentTasks filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(HLTPaymentTask *  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject.productId isEqual:productId];
+    }]];
+    if (paymentTasks.count > 0) {
+        HLTLog(@"ongoingPaymentTaskForProductId(%@): %@", productId, paymentTasks);
+    }
+    
+    return paymentTasks.lastObject;
 }
 
 - (void)tryRetrievalOrder:(HLTOrderModel *)order {
@@ -290,6 +317,15 @@ NSString * const HLTLogErrCodeKey = @"err_code";
 }
 
 - (void)refreshPaymentReceipts:(HLTReceiptRefreshCompletion)completion {
+    NSTimeInterval lastTime = [[NSUserDefaults standardUserDefaults] doubleForKey:@"hlt.rcpt.refresh.time"];
+    if ([[NSDate date] timeIntervalSince1970] - lastTime < 5 * 60) {
+        HLTLog(@"refreshPaymentReceipts cancel! lastTime: %@", @(lastTime));
+        !completion ?: completion(nil, nil);
+        return;
+    }
+    
+    [[NSUserDefaults standardUserDefaults] setDouble:[[NSDate date] timeIntervalSince1970]
+                                              forKey:@"hlt.rcpt.refresh.time"];
     HLTRefreshReceiptTask *task = [[HLTRefreshReceiptTask alloc] initWithCompletion:completion];
     [[HLTPaymentQueue defaultQueue] addFetchTask:task];
 }

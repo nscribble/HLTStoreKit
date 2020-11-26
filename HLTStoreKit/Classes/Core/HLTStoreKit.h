@@ -25,6 +25,8 @@ extern NSString * const HLTLogErrCodeKey;
 // 持久化处理器
 @property (nonatomic,strong) id<HLTOrderPersistence> orderPersistence;
 
+@property (nonatomic,copy) void(^confirmOnGoingTask)(NSString *productId, NSString *title, void(^confirmCallback)(BOOL confirmed));
+
 + (instancetype)defaultStore;
 
 + (NSString *)sdkVersion;

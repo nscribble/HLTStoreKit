@@ -15,6 +15,32 @@
 #import "HLTNetwork.h"
 #import "HLTLocalReceiptVerifier.h"
 
+@interface NSDictionary (jsonTransfer)
+
+//! 请留意，可能字典数值本身非合法JSON对象，而输出-[NSDictionary description];
+- (NSString *)transferToString;
+
+@end
+
+@implementation NSDictionary (jsonTransfer)
+
+- (NSString *)transferToString {
+    if (![NSJSONSerialization isValidJSONObject:self]) {
+        return [self description];
+    }
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self options:NSJSONWritingPrettyPrinted error: &error];
+    NSMutableString *jsonString = @"".mutableCopy;
+    if (jsonData) {
+        jsonString = [[NSString alloc]initWithData:jsonData encoding:NSUTF8StringEncoding].mutableCopy;
+        [jsonString replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:NSMakeRange(0, jsonString.length)];
+        [jsonString replaceOccurrencesOfString:@"\n" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, jsonString.length)];
+    }
+    return jsonString;
+}
+
+@end
+
 @implementation HLTStoreKitExample
 
 + (void)setupStoreKit {
@@ -24,7 +50,25 @@
         va_start(args, format);
         NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
         va_end(args);
-        NSLog(@"%@", message);
+        
+        NSString *event = params[HLTLogEventKey];
+        NSMutableDictionary *paramsM = [params mutableCopy];
+        [paramsM removeObjectForKey:HLTLogEventKey];
+        [paramsM removeObjectForKey:HLTLogErrorKey];
+        NSLog(@"%@%@, %@", (event ? [NSString stringWithFormat:@"[%@] ", event] : @""), message, [paramsM transferToString]);
+    }];
+    
+    [[HLTStoreKit defaultStore] setConfirmOnGoingTask:^(NSString * _Nonnull productId, NSString * _Nonnull title, void (^ _Nonnull confirmCallback)(BOOL)) {
+        NSString *productDesc = title.length ? [NSString stringWithFormat:@"（%@）", title] : @"";
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"购买提示" message:[NSString stringWithFormat:@"已有相同商品%@正在购买，是否继续？", productDesc] preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"确认" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+            !confirmCallback ?: confirmCallback(YES);
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            !confirmCallback ?: confirmCallback(NO);
+        }]];
+        
+        [[UIApplication sharedApplication].delegate.window.rootViewController presentViewController:alert animated:YES completion:NULL];
     }];
     
     // 定制 订单生成、订单校验逻辑（也可自定义实现几个相关协议）

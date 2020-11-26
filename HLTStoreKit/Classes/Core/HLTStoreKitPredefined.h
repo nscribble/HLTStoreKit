@@ -43,6 +43,7 @@ static NSString * const kLogEvent_SKTransaction_Update    = @"iap_transaction_up
 static NSString * const kLogEvent_SKPaymentSuccess = @"iap_payment_success";
 static NSString * const kLogEvent_SKPaymentNoTask  = @"iap_payment_notask";
 static NSString * const kLogEvent_SKPaymentFailed  = @"iap_payment_failed";
+static NSString * const kLogEvent_SKPaymentRestore = @"iap_payment_restore";
 static NSString * const kLogEvent_VerifySuccess    = @"iap_verify_success";
 static NSString * const kLogEvent_VerifyFailed     = @"iap_verify_failed";
 static NSString * const kLogEvent_PrefetchProductsSuccess  = @"iap_prefetch_products_success";

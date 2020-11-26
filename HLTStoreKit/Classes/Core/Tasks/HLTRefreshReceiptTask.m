@@ -52,6 +52,7 @@ SKRequestDelegate
 }
 
 - (void)startTask {
+    // TODO: 备份
     SKReceiptRefreshRequest *request = [[SKReceiptRefreshRequest alloc] initWithReceiptProperties:@{SKReceiptPropertyIsExpired: @0}];
     request.delegate = self;
     [request start];
