@@ -27,7 +27,7 @@ extern NSString * const HLTLogErrCodeKey;
 
 + (instancetype)defaultStore;
 
-+ (NSString *)version;
++ (NSString *)sdkVersion;
 
 - (NSTimeInterval)launchTime;
 

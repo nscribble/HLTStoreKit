@@ -126,6 +126,10 @@
     return self.skTransaction.transactionIdentifier ?: self.transaction.transactionIdentifier;
 }
 
+- (NSData *)transactionReceipt {
+    return self.skTransaction.transactionReceipt ?: self.transaction.receiptData;
+}
+
 - (BOOL)isOrderIdValid {
     return self.orderId != nil && self.orderId.length > 0 && ![self.orderId hasPrefix:@"temp"];
 }

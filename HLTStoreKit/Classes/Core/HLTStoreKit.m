@@ -66,8 +66,8 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     return self;
 }
 
-+ (NSString *)version {
-    return  HLTStoreKitVersion;
++ (NSString *)sdkVersion {
+    return HLTStoreKitVersion;
 }
 
 #pragma mark -

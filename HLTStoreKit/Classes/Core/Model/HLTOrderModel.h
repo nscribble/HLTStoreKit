@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isEqualToOrder:(HLTOrderModel *)other;
 
 - (NSString * _Nullable)transactionIdentifier;
+- (NSData * _Nullable)transactionReceipt;
 
 #pragma mark -
 
