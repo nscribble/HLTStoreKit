@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HLTStoreKit'
-  s.version          = '0.8.4'
+  s.version          = '0.8.5'
   s.summary          = 'HLTStoreKit is to ease your pain for iap.'
 
 # This description is used to generate tags and improve search results.
@@ -38,5 +38,7 @@ HLTStoreKit is to ease your pain for iap. just have a try.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = 'StoreKit', 'Foundation'
+  s.script_phase = { :name => "Update Version", :script => "echo '#define HLTStoreKitVersion @\"#{s.version.to_s}\"' >  ${PODS_TARGET_SRCROOT}/HLTStoreKit/Classes/HLTStoreKitVersion.h", :execution_position => :before_compile , :shell_path => "/bin/sh"}
+
 #  s.dependency 'HLTAPIClient'
 end

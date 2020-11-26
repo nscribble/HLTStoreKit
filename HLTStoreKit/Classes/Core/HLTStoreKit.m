@@ -12,6 +12,11 @@
 #import "HLTPrefetchProductsTask.h"
 #import "HLTRefreshReceiptTask.h"
 #import "NSObject+Ext.h"
+#import "HLTStoreKitVersion.h"
+
+#ifndef HLTStoreKitVersion
+#define HLTStoreKitVersion @"0.8.4"
+#endif
 
 @import StoreKit;
 
@@ -60,6 +65,12 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     
     return self;
 }
+
++ (NSString *)version {
+    return  HLTStoreKitVersion;
+}
+
+#pragma mark -
 
 - (NSMutableDictionary<NSString *,SKProduct *> *)id2Products{
     if (!_id2Products) {

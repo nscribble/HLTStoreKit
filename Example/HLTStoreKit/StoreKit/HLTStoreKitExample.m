@@ -7,7 +7,11 @@
 //
 
 #import "HLTStoreKitExample.h"
-#import <HLTStoreKit/HLTStoreKit-umbrella.h>
+#import <HLTStoreKit/HLTStoreKit.h>
+#import <HLTStoreKit/HLTOrderDefaultGenerator.h>
+#import <HLTStoreKit/HLTOrderDefaultVerifier.h>
+#import <HLTStoreKit/HLTOrderKeychainStore.h>
+#import <HLTStoreKit/HLTPaymentQueue.h>
 #import "HLTNetwork.h"
 #import "HLTLocalReceiptVerifier.h"
 

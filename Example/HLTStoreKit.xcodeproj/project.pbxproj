@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		422F465323A232D400042B65 /* HLTNetwork.m in Sources */ = {isa = PBXBuildFile; fileRef = 422F465223A232D400042B65 /* HLTNetwork.m */; };
 		422F465723A2358200042B65 /* HLTStoreKitExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 422F465623A2358200042B65 /* HLTStoreKitExample.m */; };
+		5C5F444DA0002F7CFE43ED2E /* libPods-HLTStoreKit_Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ACB2E5C65FD08BBD4582CDB /* libPods-HLTStoreKit_Tests.a */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
@@ -32,8 +33,7 @@
 		940EA936255E5FCD0013D0AA /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 940EA931255E5FCC0013D0AA /* RMAppReceipt.m */; };
 		94E98ECA255D518D00498064 /* HLTStoreKit_ExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 94E98EC9255D518D00498064 /* HLTStoreKit_ExampleTests.m */; };
 		94E98ED9255D51A200498064 /* StoreKitTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94E98ED8255D51A200498064 /* StoreKitTest.framework */; };
-		A9065E2A3260554CD088DF85 /* Pods_HLTStoreKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BD2F31739B133F263C48BF4 /* Pods_HLTStoreKit_Tests.framework */; };
-		EF13729E8C0958A974FDE0BA /* Pods_HLTStoreKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E98C64C969556BDCAED6B7B /* Pods_HLTStoreKit_Example.framework */; };
+		E932CC53886358F7A826902B /* libPods-HLTStoreKit_Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B283E4FB05B5C6CFE3182434 /* libPods-HLTStoreKit_Example.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,7 +61,6 @@
 		422F465223A232D400042B65 /* HLTNetwork.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = HLTNetwork.m; path = Network/HLTNetwork.m; sourceTree = "<group>"; };
 		422F465523A2358200042B65 /* HLTStoreKitExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HLTStoreKitExample.h; path = StoreKit/HLTStoreKitExample.h; sourceTree = "<group>"; };
 		422F465623A2358200042B65 /* HLTStoreKitExample.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = HLTStoreKitExample.m; path = StoreKit/HLTStoreKitExample.m; sourceTree = "<group>"; };
-		5BD2F31739B133F263C48BF4 /* Pods_HLTStoreKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HLTStoreKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58A195388D20070C39A /* HLTStoreKit_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HLTStoreKit_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -84,7 +83,6 @@
 		6568FC02C01046638320DFF1 /* HLTStoreKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = HLTStoreKit.podspec; path = ../HLTStoreKit.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		6E443EADEC0411CE45CA2CE6 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		71719F9E1E33DC2100824A3D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		7E98C64C969556BDCAED6B7B /* Pods_HLTStoreKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HLTStoreKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		940EA873255E5CDC0013D0AA /* HLTLocalReceiptVerifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HLTLocalReceiptVerifier.h; path = StoreKit/HLTLocalReceiptVerifier.h; sourceTree = "<group>"; };
 		940EA874255E5CDC0013D0AA /* HLTLocalReceiptVerifier.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = HLTLocalReceiptVerifier.m; path = StoreKit/HLTLocalReceiptVerifier.m; sourceTree = "<group>"; };
@@ -176,6 +174,8 @@
 		94E98ECB255D518D00498064 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		94E98ED8255D51A200498064 /* StoreKitTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKitTest.framework; path = Developer/Library/Frameworks/StoreKitTest.framework; sourceTree = SDKROOT; };
 		94E98EDD255D55EF00498064 /* StoreKitTest.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = StoreKitTest.cer; sourceTree = SOURCE_ROOT; };
+		9ACB2E5C65FD08BBD4582CDB /* libPods-HLTStoreKit_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HLTStoreKit_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B283E4FB05B5C6CFE3182434 /* libPods-HLTStoreKit_Example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HLTStoreKit_Example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF63E7E020A09EECE8912350 /* Pods-HLTStoreKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HLTStoreKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HLTStoreKit_Tests/Pods-HLTStoreKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		F229EC8F1D2DF0C4D69C1087 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -190,7 +190,7 @@
 				940EA934255E5FCD0013D0AA /* libssl.a in Frameworks */,
 				6003F592195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F58E195388D20070C39A /* Foundation.framework in Frameworks */,
-				EF13729E8C0958A974FDE0BA /* Pods_HLTStoreKit_Example.framework in Frameworks */,
+				E932CC53886358F7A826902B /* libPods-HLTStoreKit_Example.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,7 +201,7 @@
 				6003F5B0195388D20070C39A /* XCTest.framework in Frameworks */,
 				6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */,
-				A9065E2A3260554CD088DF85 /* Pods_HLTStoreKit_Tests.framework in Frameworks */,
+				5C5F444DA0002F7CFE43ED2E /* libPods-HLTStoreKit_Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,8 +268,8 @@
 				6003F58F195388D20070C39A /* CoreGraphics.framework */,
 				6003F591195388D20070C39A /* UIKit.framework */,
 				6003F5AF195388D20070C39A /* XCTest.framework */,
-				7E98C64C969556BDCAED6B7B /* Pods_HLTStoreKit_Example.framework */,
-				5BD2F31739B133F263C48BF4 /* Pods_HLTStoreKit_Tests.framework */,
+				B283E4FB05B5C6CFE3182434 /* libPods-HLTStoreKit_Example.a */,
+				9ACB2E5C65FD08BBD4582CDB /* libPods-HLTStoreKit_Tests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -487,7 +487,6 @@
 				6003F586195388D20070C39A /* Sources */,
 				6003F587195388D20070C39A /* Frameworks */,
 				6003F588195388D20070C39A /* Resources */,
-				84C0DDECACDE666621AD83F8 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -506,7 +505,6 @@
 				6003F5AA195388D20070C39A /* Sources */,
 				6003F5AB195388D20070C39A /* Frameworks */,
 				6003F5AC195388D20070C39A /* Resources */,
-				C242DF761265CEB7C8C56983 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -632,42 +630,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		84C0DDECACDE666621AD83F8 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HLTStoreKit_Example/Pods-HLTStoreKit_Example-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/HLTStoreKit/HLTStoreKit.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HLTStoreKit.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HLTStoreKit_Example/Pods-HLTStoreKit_Example-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C242DF761265CEB7C8C56983 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HLTStoreKit_Tests/Pods-HLTStoreKit_Tests-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Kiwi/Kiwi.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kiwi.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HLTStoreKit_Tests/Pods-HLTStoreKit_Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CE0C2DC7A6AD0D808DEDCB13 /* [CP] Check Pods Manifest.lock */ = {

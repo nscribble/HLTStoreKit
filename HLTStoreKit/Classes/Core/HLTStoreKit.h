@@ -27,6 +27,8 @@ extern NSString * const HLTLogErrCodeKey;
 
 + (instancetype)defaultStore;
 
++ (NSString *)version;
+
 - (NSTimeInterval)launchTime;
 
 #pragma mark - Configuration
