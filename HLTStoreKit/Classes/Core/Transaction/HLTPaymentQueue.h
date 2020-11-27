@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 // 接收到无任务交易通知。object=SKPaymentTransaction，userInfo={order:HLTOrderModel}
 extern NSString * const HLTReceiveTransactionWithNoTaskNotification;
 extern NSString * const HLTReceiveTransactionOrderKey;
+extern NSString * const HLTStorageTransactionFailedCountKey;
 
 @class HLTPaymentTask;
 @interface HLTPaymentQueue : NSObject<SKPaymentTransactionObserver>
@@ -25,7 +26,7 @@ extern NSString * const HLTReceiveTransactionOrderKey;
 
 - (NSInteger)taskMaxConcurrentCount;
 - (void)setTaskConcurrentCount:(NSInteger)count;
-- (void)disableApplicationUsername;
+- (void)disableApplicationUsername:(BOOL)disable;
 
 #pragma mark -
 

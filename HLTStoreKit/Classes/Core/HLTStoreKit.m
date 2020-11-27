@@ -269,6 +269,19 @@ NSString * const HLTLogErrCodeKey = @"err_code";
         }
     }
     
+    NSInteger failedCount = [[NSUserDefaults standardUserDefaults] integerForKey:HLTStorageTransactionFailedCountKey];
+    if (failedCount > 3) {
+        HLTLog(@"暂停使用applicationUsername");
+        [[HLTPaymentQueue defaultQueue] disableApplicationUsername:YES];
+    }
+    
+    if (failedCount > 5) {
+        HLTLog(@"failedCount > 5，尝试刷新receipts");
+        [self refreshPaymentReceipts:^(NSError *error, NSURL *receiptURL) {
+            [[HLTPaymentQueue defaultQueue] disableApplicationUsername:NO];
+        }];
+    }
+    
     HLTPaymentQueue *queue = [HLTPaymentQueue defaultQueue];
     if (queue.paymentTasksOnGoing.count >= queue.taskMaxConcurrentCount) {
         HLTLog(@"当前有支付任务，已提交，请耐心等候！");

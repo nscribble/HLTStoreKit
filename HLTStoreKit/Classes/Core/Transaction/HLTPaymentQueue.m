@@ -18,6 +18,8 @@ static NSString * const HLTTransactionOrderIdKey = @"orderId";
 NSString * const HLTReceiveTransactionWithNoTaskNotification = @"com.storekit.transactionwithnotask";
 NSString * const HLTReceiveTransactionOrderKey = @"order";
 
+NSString * const HLTStorageTransactionFailedCountKey = @"hltstorekit_failed_count";
+
 #pragma mark - HLTPaymentQueue
 
 @interface HLTPaymentQueue ()
@@ -127,8 +129,8 @@ HLTPaymentTaskDelegate
     return self.taskQueue.maxConcurrentOperationCount;
 }
 
-- (void)disableApplicationUsername {
-    self.doNotUseApplicationUsername = YES;
+- (void)disableApplicationUsername:(BOOL)disable {
+    self.doNotUseApplicationUsername = disable;
 }
 
 #pragma mark -
