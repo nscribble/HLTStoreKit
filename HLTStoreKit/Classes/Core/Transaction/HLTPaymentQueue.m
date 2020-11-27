@@ -454,6 +454,8 @@ HLTPaymentTaskDelegate
         return;
     }
     
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:HLTStorageTransactionFailedCountKey];
+    
     HLTPaymentTask *task = [self searchTaskMatchingOrderId:orderId
                                                  productId:productId];
     if (task) {
@@ -506,6 +508,10 @@ HLTPaymentTaskDelegate
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKPaymentFailed,
                    HLTLogErrorKey: (transaction.error ?: @"errorNil"),
                    }, @"[Payment] Transaction Failed: [%@][%@], error: %@", transaction.payment.productIdentifier, transaction.payment.applicationUsername, transaction.error);
+    
+    NSInteger count = [[NSUserDefaults standardUserDefaults] integerForKey:HLTStorageTransactionFailedCountKey];
+    [[NSUserDefaults standardUserDefaults] setInteger:(count + 1) forKey:HLTStorageTransactionFailedCountKey];
+    
     // 当前App周期的任务
     NSString *orderId = [self orderIdFromTransaction:transaction];
     HLTPaymentTask *task = [self searchTaskMatchingOrderId:orderId
