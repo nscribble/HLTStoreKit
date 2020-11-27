@@ -23,6 +23,7 @@ extern NSString * const HLTReceiveTransactionOrderKey;
 
 + (instancetype)defaultQueue;
 
+- (NSInteger)taskMaxConcurrentCount;
 - (void)setTaskConcurrentCount:(NSInteger)count;
 - (void)disableApplicationUsername;
 

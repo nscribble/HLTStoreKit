@@ -269,6 +269,10 @@ NSString * const HLTLogErrCodeKey = @"err_code";
         }
     }
     
+    HLTPaymentQueue *queue = [HLTPaymentQueue defaultQueue];
+    if (queue.paymentTasksOnGoing.count >= queue.taskMaxConcurrentCount) {
+        HLTLog(@"当前有支付任务，已提交，请耐心等候！");
+    }
     [[HLTPaymentQueue defaultQueue] addPaymentTask:task];
 }
 

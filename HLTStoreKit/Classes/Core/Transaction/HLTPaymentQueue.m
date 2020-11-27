@@ -123,6 +123,10 @@ HLTPaymentTaskDelegate
     self.taskQueue.maxConcurrentOperationCount = count;
 }
 
+- (NSInteger)taskMaxConcurrentCount {
+    return self.taskQueue.maxConcurrentOperationCount;
+}
+
 - (void)disableApplicationUsername {
     self.doNotUseApplicationUsername = YES;
 }
