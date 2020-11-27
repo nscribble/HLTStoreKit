@@ -388,11 +388,13 @@ HLTPaymentTaskDelegate
 - (void)taskVerifyOrderFailed:(HLTPaymentTask *)task {
     //[self.orderPersistence storeBackupOrder:task.order];
     //[self.orderPersistence removeOrder:task.order];
+    [self.orderPersistence storeOrder:task.order];
     
     [[self metricsForPaymentTask:task] setVerifyFinishDate:nil];
 }
 
 - (void)taskVerifyOrderSuccess:(HLTPaymentTask *)task {
+    [self.orderPersistence storeOrder:task.order];
     [self.orderPersistence removeOrder:task.order];
     
     [[self metricsForPaymentTask:task] setVerifyFinishDate:[NSDate date]];
