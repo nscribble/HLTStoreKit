@@ -180,6 +180,11 @@ HLTPaymentTaskDelegate
 }
 
 - (void)checkAbnormalTask {
+    if (self.taskQueue.maxConcurrentOperationCount > 1) {
+        HLTLog(@"taskQueue concurrent count > 0, do not check abnormal task");
+        return;
+    }
+    
     BOOL isLikelyAbnormal = NO;
     NSMutableDictionary *counts = @{}.mutableCopy;
     [self.tasks enumerateObjectsUsingBlock:^(HLTPaymentTask * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -375,8 +380,8 @@ HLTPaymentTaskDelegate
 }
 
 - (void)taskVerifyOrderFailed:(HLTPaymentTask *)task {
-    [self.orderPersistence storeBackupOrder:task.order];// todo: 验证订单失败放到其他队列
-    [self.orderPersistence removeOrder:task.order];
+    //[self.orderPersistence storeBackupOrder:task.order];
+    //[self.orderPersistence removeOrder:task.order];
     
     [[self metricsForPaymentTask:task] setVerifyFinishDate:nil];
 }

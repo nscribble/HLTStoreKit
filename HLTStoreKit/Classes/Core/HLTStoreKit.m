@@ -206,8 +206,8 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     
     if (filtered.count <= 0) {
         HLTLog(@"filtered productIds.count = 0");
-//        !completion ?: completion(matched, nil);
-//        return;
+        !completion ?: completion(matched, nil);
+        return;
     }
     
     // 暂存 callbacks

@@ -109,9 +109,9 @@ static HLTOrderGenReqProcessingBlock hlt_orderGenReqProcessingBlock;
     }
     
     if (self.retryCount < kOrderCreateMaxTryCount - 1) {
-        if ([error.domain isEqualToString:NSURLErrorDomain]) {
+//        if ([error.domain isEqualToString:NSURLErrorDomain]) {
             return YES;
-        }
+//        }
     }
     
     return NO;

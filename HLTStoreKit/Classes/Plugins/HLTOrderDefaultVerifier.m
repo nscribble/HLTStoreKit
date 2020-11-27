@@ -117,9 +117,9 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
     }
     
     if (self.retryCount < kOrderVerifyMaxTryCount - 1) {
-        if ([error.domain isEqualToString:NSURLErrorDomain]) {
+//        if ([error.domain isEqualToString:NSURLErrorDomain]) {
             return YES;
-        }
+//        }
     }
     
     return NO;
