@@ -283,7 +283,8 @@ SKProductsRequestDelegate
 // 创建订单成功
 - (void)processOnOrderCreated:(HLTOrderModel *)orderModel {
     HLTLogParams(@{HLTLogEventKey: kLogEvent_OrderSuccess,
-                   @"orderId": (orderModel.orderId ?: @"orderIdNil")
+                   @"orderId": (orderModel.orderId ?: @"orderIdNil"),
+                   @"productId": (orderModel.productId ?: @"")
                    }, @"[Payment] Order(%@) Success", self);
     self.order = orderModel;
     self.order.orderStatus = HLTOrderStatusOrderCreated;

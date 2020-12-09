@@ -130,14 +130,7 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     }
     
     if (!transaction.transactionReceipt) {
-        BOOL isReceiptUpToDate = NO;
-        if (!isReceiptUpToDate) {
-            [self refreshPaymentReceipts:^(NSError *error, NSURL *receiptURL) {
-                [self __tryRetrievalOrder:order transaction:transaction];
-            }];
-            
-            return;
-        }
+        HLTLog(@"transactionReceipt is nil");
     }
     
     [self __tryRetrievalOrder:order transaction:transaction];
@@ -277,9 +270,9 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     
     if (failedCount > 5) {
         HLTLog(@"failedCount > 5，尝试刷新receipts");
-        [self refreshPaymentReceipts:^(NSError *error, NSURL *receiptURL) {
-            [[HLTPaymentQueue defaultQueue] disableApplicationUsername:NO];
-        }];
+//        [self refreshPaymentReceipts:^(NSError *error, NSURL *receiptURL) {
+//            [[HLTPaymentQueue defaultQueue] disableApplicationUsername:NO];
+//        }];
     }
     
     HLTPaymentQueue *queue = [HLTPaymentQueue defaultQueue];

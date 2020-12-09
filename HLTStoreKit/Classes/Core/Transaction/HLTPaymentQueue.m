@@ -505,15 +505,19 @@ HLTPaymentTaskDelegate
 }
 
 - (void)didFailTransaction:(SKPaymentTransaction *)transaction queue:(SKPaymentQueue*)queue {
+    NSString *orderId = [self orderIdFromTransaction:transaction];
+    BOOL isJailbreak = [HLTJailbreakDetect isJailbreak];
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKPaymentFailed,
                    HLTLogErrorKey: (transaction.error ?: @"errorNil"),
+                   @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
+                   @"isJailbreak": @(isJailbreak),
+                   @"orderId": (orderId ?: @"orderIdNil"),
                    }, @"[Payment] Transaction Failed: [%@][%@], error: %@", transaction.payment.productIdentifier, transaction.payment.applicationUsername, transaction.error);
     
     NSInteger count = [[NSUserDefaults standardUserDefaults] integerForKey:HLTStorageTransactionFailedCountKey];
     [[NSUserDefaults standardUserDefaults] setInteger:(count + 1) forKey:HLTStorageTransactionFailedCountKey];
     
     // 当前App周期的任务
-    NSString *orderId = [self orderIdFromTransaction:transaction];
     HLTPaymentTask *task = [self searchTaskMatchingOrderId:orderId
                                                  productId:transaction.payment.productIdentifier];
     if (task) {
@@ -955,8 +959,8 @@ HLTPaymentTaskDelegate
     /*}*/
     
     NSArray *parts = [applicationUsername componentsSeparatedByString:@","];
-    return @{HLTTransactionUserIdKey: parts.lastObject,
-             HLTTransactionOrderIdKey: parts.firstObject
+    return @{HLTTransactionUserIdKey: (parts.lastObject ?: @""),
+             HLTTransactionOrderIdKey: (parts.firstObject ?: @"")
     };
 }
 
