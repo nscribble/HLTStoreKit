@@ -412,6 +412,7 @@ HLTPaymentTaskDelegate
     [self.onGoingTasks removeObject:task];
     
     [[self metricsForPaymentTask:task] setTaskFinishDate:[NSDate date]];
+    [self removeMetricsForTask:task];
 }
 
 - (void)taskDidCancel:(HLTPaymentTask *)task {
@@ -424,6 +425,8 @@ HLTPaymentTaskDelegate
     }
     [self.tasks removeObject:task];
     [self.onGoingTasks removeObject:task];
+    
+    [self removeMetricsForTask:task];
 }
 
 #pragma mark -
@@ -444,8 +447,8 @@ HLTPaymentTaskDelegate
     NSString *orderId = [self orderIdFromTransaction:transaction];// 当前App周期的任务
     
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKPaymentSuccess,
-                   @"transactionIdentifier": (transaction.transactionIdentifier ?: @""),
-                   @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
+                   @"tId": (transaction.transactionIdentifier ?: @""),
+                   @"productId": (transaction.payment.productIdentifier ?: @""),
                    @"orderId": (orderId ?: @"orderIdNil"),
                    @"isJailbreak": @([HLTJailbreakDetect isJailbreak]),
                    }, @"[Transaction] didPurchased: [%@|%@] %@", transaction.payment.productIdentifier, transaction.payment.productIdentifier, (orderId ?: @"orderIdNil"));
@@ -468,7 +471,7 @@ HLTPaymentTaskDelegate
     NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
     BOOL isJailbreak = [HLTJailbreakDetect isJailbreak];
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKPaymentNoTask,
-                   @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
+                   @"productId": (transaction.payment.productIdentifier ?: @""),
                    @"isJailbreak": @(isJailbreak),
                    @"orderId": (orderId ?: @"orderIdNil"),
                    }, @"[Transaction] No Task matched! Launch at: %@, now: %@, jailbreak: %@",  @(self.launchTime), @(now), @(isJailbreak));
@@ -509,9 +512,10 @@ HLTPaymentTaskDelegate
     BOOL isJailbreak = [HLTJailbreakDetect isJailbreak];
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKPaymentFailed,
                    HLTLogErrorKey: (transaction.error ?: @"errorNil"),
-                   @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
+                   @"productId": (transaction.payment.productIdentifier ?: @""),
                    @"isJailbreak": @(isJailbreak),
                    @"orderId": (orderId ?: @"orderIdNil"),
+                   @"tId": (transaction.transactionIdentifier ?: @"")
                    }, @"[Payment] Transaction Failed: [%@][%@], error: %@", transaction.payment.productIdentifier, transaction.payment.applicationUsername, transaction.error);
     
     NSInteger count = [[NSUserDefaults standardUserDefaults] integerForKey:HLTStorageTransactionFailedCountKey];
@@ -552,7 +556,7 @@ HLTPaymentTaskDelegate
 
 - (void)didRestoreTransaction:(SKPaymentTransaction *)transaction queue:(SKPaymentQueue*)queue {
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKPaymentRestore,
-                   @"productIdentifier": (transaction.payment.productIdentifier ?: @""),
+                   @"productId": (transaction.payment.productIdentifier ?: @""),
                    @"isJailbreak": @([HLTJailbreakDetect isJailbreak]),
                  }, @"[Payment] didRestoreTransaction");
 }
