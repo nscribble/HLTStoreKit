@@ -1,1 +1,1 @@
-#define HLTStoreKitVersion @"0.8.8"
+#define HLTStoreKitVersion @"0.8.9"

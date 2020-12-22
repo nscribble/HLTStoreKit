@@ -6,15 +6,17 @@
 //
 
 #import "HLTOrderModel.h"
+#import "HLTStoreKitVersion.h"
 @import StoreKit;
 
-@interface HLTOrderModel ()<NSCopying>
+@interface HLTOrderModel ()
 
 // 交易信息（用于备份）
 @property (nonatomic,strong,readwrite) HLTOrderTransaction *transaction;
 // IAP交易信息
 @property (nonatomic,strong,readwrite) SKPaymentTransaction *skTransaction;
 @property (nonatomic,assign,readwrite) NSTimeInterval updateTime;
+@property (nonatomic,copy,readwrite) NSString *sdkVersion;
 
 @end
 
@@ -85,6 +87,8 @@
     }
     
     _orderStatus = orderStatus;
+    _updateTime = [[NSDate date] timeIntervalSince1970];
+    _sdkVersion = HLTStoreKitVersion;
 }
 
 - (BOOL)canTransToStatus:(HLTOrderStatus)status {
@@ -171,6 +175,7 @@
         _transaction = [aDecoder decodeObjectOfClass:[HLTOrderTransaction class] forKey:NSStringFromSelector(@selector(transaction))];
         _userInfo = [aDecoder decodeObjectOfClass:[NSDictionary class] forKey:NSStringFromSelector(@selector(userInfo))];
         _updateTime = [aDecoder decodeDoubleForKey:NSStringFromSelector(@selector(updateTime))];
+        _sdkVersion = [aDecoder decodeObjectOfClass:[NSString class] forKey:NSStringFromSelector(@selector(sdkVersion))];
     }
     
     return self;
@@ -188,9 +193,8 @@
     [aCoder encodeInteger:self.receiptVerifyCount forKey:NSStringFromSelector(@selector(receiptVerifyCount))];
     [aCoder encodeObject:self.transaction forKey:NSStringFromSelector(@selector(transaction))];
     [aCoder encodeObject:self.userInfo forKey:NSStringFromSelector(@selector(userInfo))];
-    [aCoder encodeDouble:[[NSDate date] timeIntervalSince1970] forKey:NSStringFromSelector(@selector(updateTime))];
+    [aCoder encodeDouble:self.updateTime forKey:NSStringFromSelector(@selector(updateTime))];
+    [aCoder encodeObject:self.sdkVersion forKey:NSStringFromSelector(@selector(sdkVersion))];
 }
-
-//- (id)copyWithZone:(NSZone *)zone
 
 @end

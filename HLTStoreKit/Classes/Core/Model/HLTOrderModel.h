@@ -38,8 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong,readonly) HLTOrderTransaction *transaction;
 // IAP交易信息
 @property (nonatomic,strong,readonly) SKPaymentTransaction *skTransaction;
-
+// 订单状态变更时间
 @property (nonatomic,assign,readonly) NSTimeInterval updateTime;
+// 订单使用的SDK版本
+@property (nonatomic,copy,readonly) NSString *sdkVersion;
 
 // 用户自定义信息
 @property (nonatomic,strong) NSDictionary *userInfo;
