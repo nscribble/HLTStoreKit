@@ -328,13 +328,17 @@ SKProductsRequestDelegate
     
     self.order.orderStatus = HLTOrderStatusReceiptFailed;
     self.order.receiptVerifyCount += 1;
-    if ([self.delegate respondsToSelector:@selector(taskVerifyOrderFailed:)]) {
-        [self.delegate taskVerifyOrderFailed:self];
+    if ([self.delegate respondsToSelector:@selector(taskVerifyOrderFailed:error:)]) {
+        [self.delegate taskVerifyOrderFailed:self error:error];
     }
     
-    NSError *err = [self ht_storeKitErrorWithCode:HLTPaymentErrorVerifyOrderFailed
-                                      description:@"验证订单失败"];
-    [self callBackWithFatalError:[err errorWithUnderlying:error]];
+    NSError *err = error;
+    if (![err.domain isEqual:HLTStoreKitErrorDomain]) {
+        err = [self ht_storeKitErrorWithCode:HLTPaymentErrorVerifyOrderFailed
+                                 description:@"验证订单失败"];
+        err = [err errorWithUnderlying:error];
+    }
+    [self callBackWithFatalError:err];
 }
 
 - (void)processOnOrderVerified:(NSDictionary *)responseObject {

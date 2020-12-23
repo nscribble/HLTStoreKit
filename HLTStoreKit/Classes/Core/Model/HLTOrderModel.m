@@ -92,6 +92,10 @@
 }
 
 - (BOOL)canTransToStatus:(HLTOrderStatus)status {
+    if (status == self.orderStatus) {
+        return YES;
+    }
+    
     switch (self.orderStatus) {
         case HLTOrderStatusReceiptVerified: {
             return status == HLTOrderStatusReceiptVerified;

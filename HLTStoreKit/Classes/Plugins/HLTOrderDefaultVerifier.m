@@ -86,7 +86,7 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
             return;
         }
         
-        // 失败
+        // 成功
         weakSelf.reqStatus = HLTVerifyReqStatusFinished;
         if (weakSelf.completion) {
             weakSelf.completion(request, success, error);

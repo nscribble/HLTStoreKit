@@ -385,10 +385,17 @@ HLTPaymentTaskDelegate
     [[self metricsForPaymentTask:task] setVerifyStartDate:[NSDate date]];
 }
 
-- (void)taskVerifyOrderFailed:(HLTPaymentTask *)task {
+- (void)taskVerifyOrderFailed:(HLTPaymentTask *)task error:(nonnull NSError *)error{
     //[self.orderPersistence storeBackupOrder:task.order];
     //[self.orderPersistence removeOrder:task.order];
-    [self.orderPersistence storeOrder:task.order];
+    
+    if (error.code == HLTPaymentErrorServiceShipped &&
+        [error.domain isEqual:HLTStoreKitErrorDomain]) {// 不再尝试verify
+        [self.orderPersistence storeBackupOrder:task.order];
+        [self.orderPersistence removeOrder:task.order];
+    } else {
+        [self.orderPersistence storeOrder:task.order];
+    }
     
     [[self metricsForPaymentTask:task] setVerifyFinishDate:nil];
 }
@@ -904,6 +911,8 @@ HLTPaymentTaskDelegate
 #pragma mark Metrics
 
 - (HLTTaskTransactionMetrics *)metricsForPaymentTask:(HLTPaymentTask *)task {
+    return nil;
+    /*
     if (!task.taskId) {
         return nil;
     }
@@ -918,7 +927,7 @@ HLTPaymentTaskDelegate
         self.id2TaskMetrics[task.taskId] = metrics;
     }
     
-    return metrics;
+    return metrics;*/
 }
 
 - (void)removeMetricsForTask:(HLTPaymentTask *)task {

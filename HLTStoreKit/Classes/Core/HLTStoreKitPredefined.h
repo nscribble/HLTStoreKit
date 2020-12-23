@@ -73,6 +73,7 @@ typedef NS_ENUM(NSInteger, HLTPaymentErrorCode) {
     HLTPaymentErrorCreateOrderFailed,
     HLTPaymentErrorIAPTransactionFailed,
     HLTPaymentErrorVerifyOrderFailed,
+    HLTPaymentErrorServiceShipped, // 服务已交付
 };
 
 // 任务状态

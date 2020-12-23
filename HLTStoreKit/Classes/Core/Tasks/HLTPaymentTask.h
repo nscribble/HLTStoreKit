@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)taskCreateOrderSuccess:(HLTPaymentTask *)task;
 
 - (void)taskWillVerifyOrder:(HLTPaymentTask *)task;
-- (void)taskVerifyOrderFailed:(HLTPaymentTask *)task;
+- (void)taskVerifyOrderFailed:(HLTPaymentTask *)task error:(NSError *)error;
 - (void)taskVerifyOrderSuccess:(HLTPaymentTask *)task;
 
 - (void)taskDidFinish:(HLTPaymentTask *)task;
