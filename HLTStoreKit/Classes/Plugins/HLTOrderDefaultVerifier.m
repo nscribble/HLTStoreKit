@@ -14,6 +14,7 @@ typedef NS_ENUM(NSInteger, HLTVerifyReqStatus) {
     HLTVerifyReqStatusProcessing,
     HLTVerifyReqStatusRetrying,
     HLTVerifyReqStatusFinished,
+    HLTVerifyReqStatusTimeout,
 };
 
 static HLTOrderVerifyProcessingBlock hlt_orderVerifyProcessingBlock;
@@ -80,6 +81,11 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
             }
         }
         
+        if (weakSelf.reqStatus == HLTVerifyReqStatusFinished) {
+            HLTLog(@"order verify callback after finished!");
+            return;
+        }
+        
         // 失败
         weakSelf.reqStatus = HLTVerifyReqStatusFinished;
         if (weakSelf.completion) {
@@ -91,7 +97,7 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
     // 超时处理
     [self cancelTimeoutCheck];
     if (self.perReqTimeout > 0) {
-        [self performSelector:@selector(onReqTimeout) withObject:nil afterDelay:(self.perReqTimeout + self.retryDelay)];
+        [self performSelector:@selector(onReqTimeout) withObject:nil afterDelay:(self.perReqTimeout)];
     }
 }
 
@@ -102,7 +108,9 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
 - (void)onReqTimeout {
     if (self.reqStatus != HLTVerifyReqStatusFinished &&
         self.completion != NULL) {
-        NSError *err = [self ht_storeKitErrorWithCode:HLTPaymentErrorCreateOrderFailed
+        self.reqStatus = HLTVerifyReqStatusTimeout;
+        
+        NSError *err = [self ht_storeKitErrorWithCode:HLTPaymentErrorVerifyOrderFailed
                                           description:@"验证订单超时"];
         self.completion(self, NO, err);
     }

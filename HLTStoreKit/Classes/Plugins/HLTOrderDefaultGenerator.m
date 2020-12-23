@@ -17,7 +17,9 @@ static NSInteger const kOrderCreateMaxTryCount = 2;
 typedef NS_ENUM(NSInteger, HLTOrderReqStatus) {
     HLTOrderReqStatusPrepare,
     HLTOrderReqStatusProcessing,
+    HLTOrderReqStatusRetrying,
     HLTOrderReqStatusFinished,
+    HLTOrderReqStatusTimeout,
 };
 
 static HLTOrderGenReqProcessingBlock hlt_orderGenReqProcessingBlock;
@@ -76,6 +78,11 @@ static HLTOrderGenReqProcessingBlock hlt_orderGenReqProcessingBlock;
             }
         }
         
+        if (weakSelf.reqStatus == HLTOrderReqStatusFinished) {
+            HLTLog(@"order create callback after finished!");
+            return;
+        }
+        
         weakSelf.reqStatus = HLTOrderReqStatusFinished;
         if (weakSelf.completion) {
             weakSelf.completion(request, order, error);
@@ -86,7 +93,7 @@ static HLTOrderGenReqProcessingBlock hlt_orderGenReqProcessingBlock;
     // 超时处理
     [self cancelTimeoutCheck];
     if (self.perReqTimeout > 0) {
-        [self performSelector:@selector(onReqTimeout) withObject:nil afterDelay:(self.perReqTimeout + self.retryDelay)];
+        [self performSelector:@selector(onReqTimeout) withObject:nil afterDelay:(self.perReqTimeout)];
     }
 }
 
@@ -97,6 +104,7 @@ static HLTOrderGenReqProcessingBlock hlt_orderGenReqProcessingBlock;
 - (void)onReqTimeout {
     if (self.reqStatus != HLTOrderReqStatusFinished &&
         self.completion != NULL) {
+        self.reqStatus = HLTOrderReqStatusTimeout;
         NSError *err = [self ht_storeKitErrorWithCode:HLTPaymentErrorCreateOrderFailed
                                           description:@"创建订单超时"];
         self.completion(self, nil, err);
