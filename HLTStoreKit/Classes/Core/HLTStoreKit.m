@@ -27,7 +27,7 @@ HLTAppleProductProvider
 
 @property (nonatomic, strong) NSMutableDictionary<NSString *, SKProduct *> *id2Products;
 
-@property (nonatomic, strong) NSMutableArray<HLTProductRequestCompletion> *fetchCallbacks;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<HLTProductRequestCompletion> *> *fetchCallbacks;
 
 /**
  默认配置
@@ -80,9 +80,9 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     return _id2Products;
 }
 
-- (NSMutableArray<HLTProductRequestCompletion> *)fetchCallbacks {
+- (NSMutableDictionary<NSString *,NSMutableArray<HLTProductRequestCompletion> *> *)fetchCallbacks {
     if (!_fetchCallbacks) {
-        _fetchCallbacks = [NSMutableArray array];
+        _fetchCallbacks = [NSMutableDictionary dictionary];
     }
     
     return _fetchCallbacks;
@@ -203,13 +203,23 @@ NSString * const HLTLogErrCodeKey = @"err_code";
         return;
     }
     
-    // 暂存 callbacks
+    
+    NSString *taskKey = [HLTPrefetchProductsTask taskKeyForProductIdentifiers:productIdentifiers];
+    NSMutableArray<HLTProductRequestCompletion> *callbacks = [self.fetchCallbacks[taskKey] mutableCopy];
+    if (!callbacks) {
+        callbacks = [NSMutableArray array];
+    }
     if (completion) {
-        NSMutableArray *callbacks = [self.fetchCallbacks mutableCopy];
         [callbacks addObject:completion];
-        self.fetchCallbacks = callbacks;
     }
     
+    if (taskKey && [self.fetchCallbacks[taskKey] count]) {
+        HLTLog(@"已有等同FetchTask在执行");
+        return;
+    }
+    self.fetchCallbacks[taskKey] = callbacks;
+    
+//    __weak typeof(self) weakSelf = self;
     HLTPrefetchProductsTask *task = [[HLTPrefetchProductsTask alloc] initWithProductIdentifiers:productIdentifiers completion:^(NSArray<SKProduct *> *products, NSError *error) {
         if (products.count > 0) {
             [products enumerateObjectsUsingBlock:^(SKProduct * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -217,12 +227,49 @@ NSString * const HLTLogErrCodeKey = @"err_code";
             }];
         }
         
-        [self.fetchCallbacks enumerateObjectsUsingBlock:^(HLTProductRequestCompletion  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            obj(products, error);
-        }];
+        [self _callbackFetchFor:taskKey products:products error:error];
+        
+        // 若单个fetch也在等待，且已成功取到products
+        if (!error && products.count > 0 && self.fetchCallbacks.count > 0) {
+            [self.fetchCallbacks enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSMutableArray<HLTProductRequestCompletion> * _Nonnull obj, BOOL * _Nonnull stop) {
+                if (obj.count > 0 && [taskKey containsString:key]) {
+                    NSArray *matchedProducts = [self filterProductsForKey:key];
+                    if (matchedProducts.count > 0) {
+                        [self _callbackFetchFor:key
+                                       products:matchedProducts
+                                          error:error];
+                    }
+                }
+            }];
+        }
     }];
     
     [[HLTPaymentQueue defaultQueue] addFetchTask:task];
+}
+
+- (NSArray<SKProduct *> *)filterProductsForKey:(NSString *)taskKey {
+    NSMutableArray<SKProduct *> *results = @[].mutableCopy;
+    NSArray<NSString *> *pids = [taskKey componentsSeparatedByString:@","];
+    [pids enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        SKProduct *product = [self productForIdentifier:obj];
+        if (product) {
+            [results addObject:product];
+        }
+    }];
+    
+    return results;
+}
+
+- (void)_callbackFetchFor:(NSString *)taskKey products:(NSArray<SKProduct *> *)products error:(NSError *)error{
+    NSMutableArray<HLTProductRequestCompletion> *callbacks = self.fetchCallbacks[taskKey];
+    [callbacks enumerateObjectsUsingBlock:^(HLTProductRequestCompletion  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        obj(products, error);
+    }];
+    [callbacks removeAllObjects];
+    
+    if ([self.fetchCallbacks[taskKey] count] <= 0) {
+        [self.fetchCallbacks removeObjectForKey:taskKey];
+    }
 }
 
 - (void)purchase:(NSString *)productId configuration:(HLTOrderConfigurationBlock)configuration completion:(HLTPaymentCompletion)completion {
@@ -353,13 +400,15 @@ NSString * const HLTLogErrCodeKey = @"err_code";
     }
     
     SKProduct *product = [self productForIdentifier:identifier];
-    if (product) {
+    if (product && [product.productIdentifier isEqual:identifier]) {
         !completion ?: completion(product, nil);
         return;
     }
     
+    __weak typeof(self) weakSelf = self;
     [self fetchProducts:@[identifier] completion:^(NSArray<SKProduct *> *products, NSError *error) {
-        !completion ?: completion(products.lastObject, error);
+        SKProduct *product = [weakSelf productForIdentifier:identifier];
+        !completion ?: completion(product, error);
     }];
 }
 

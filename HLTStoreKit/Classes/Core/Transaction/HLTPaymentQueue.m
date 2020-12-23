@@ -368,6 +368,10 @@ HLTPaymentTaskDelegate
     
     // 开始IAP交易
     SKProduct *product = task.skProduct;
+    HLTLogParams(@{HLTLogEventKey: kLogEvent_Transaction_Start,
+                   @"productId": (product.productIdentifier ?: @""),
+                 }, @"[Transaction] Make Payment: %@(%@)", product.localizedTitle, product.productIdentifier);
+    
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
     SKMutablePayment *payment = product ? [SKMutablePayment paymentWithProduct:product] : [SKMutablePayment paymentWithProductIdentifier:task.productId];

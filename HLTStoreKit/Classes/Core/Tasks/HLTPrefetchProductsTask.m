@@ -15,6 +15,7 @@ SKRequestDelegate,
 SKProductsRequestDelegate
 >
 
+@property (nonatomic, copy) NSString *taskKey;
 @property (nonatomic, copy) NSArray<NSString *> *productIdentifiers;
 @property (nonatomic, copy) HLTProductRequestCompletion completion;
 
@@ -23,6 +24,7 @@ SKProductsRequestDelegate
 
 @end
 
+static NSInteger taskIdCount = 1000;
 @implementation HLTPrefetchProductsTask
 
 @synthesize finished = _finished, executing = _executing;
@@ -31,9 +33,20 @@ SKProductsRequestDelegate
     if (self = [super init]) {
         _productIdentifiers = productIdentifiers;
         _completion = completion;
+        _taskKey = [self.class taskKeyForProductIdentifiers:productIdentifiers];
     }
     
     return self;
+}
+
++ (NSString *)taskKeyForProductIdentifiers:(NSArray<NSString *> *)productIdentifiers {
+    NSArray *sortedPids =
+    [productIdentifiers sortedArrayUsingComparator:^NSComparisonResult(NSString *  _Nonnull obj1, NSString *  _Nonnull obj2) {
+        return [obj1 compare:obj2];
+    }];
+
+    NSString *taskKey = sortedPids.count > 1 ? [sortedPids componentsJoinedByString:@","] : sortedPids.firstObject;
+    return taskKey;
 }
 
 #pragma mark

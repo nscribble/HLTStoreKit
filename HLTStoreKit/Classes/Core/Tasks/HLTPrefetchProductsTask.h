@@ -12,8 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface HLTPrefetchProductsTask : NSOperation
 
+@property (nonatomic, copy, readonly) NSString *taskKey;// 不代表唯一性，仅代表任务等同性
+
 - (instancetype)initWithProductIdentifiers:(NSArray <NSString *> *)productIdentifiers
                                 completion:(HLTProductRequestCompletion)completion;
+
++ (NSString *)taskKeyForProductIdentifiers:(NSArray <NSString *> *)productIdentifiers;
 
 @end
 

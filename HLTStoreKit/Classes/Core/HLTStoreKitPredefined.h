@@ -39,6 +39,7 @@ static NSString * const kLogEvent_OrderSuccess     = @"iap_order_success";
 static NSString * const kLogEvent_OrderFailed      = @"iap_order_failed";
 //static NSString * const kLogEvent_OrderError       = @"iap_order_error";
 static NSString * const kLogEvent_OrderNotFound        = @"iap_order_notfound";
+static NSString * const kLogEvent_Transaction_Start    = @"iap_transaction_start";
 static NSString * const kLogEvent_SKTransaction_Update    = @"iap_transaction_update";
 static NSString * const kLogEvent_SKPaymentSuccess = @"iap_payment_success";
 static NSString * const kLogEvent_SKPaymentNoTask  = @"iap_payment_notask";
