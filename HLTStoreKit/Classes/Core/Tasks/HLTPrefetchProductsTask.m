@@ -39,10 +39,6 @@ static NSInteger taskIdCount = 1000;
     return self;
 }
 
-- (void)dealloc {
-    HLTLog(@"%@ dealloc", NSStringFromClass(self.class));
-}
-
 + (NSString *)taskKeyForProductIdentifiers:(NSArray<NSString *> *)productIdentifiers {
     NSArray *sortedPids =
     [productIdentifiers sortedArrayUsingComparator:^NSComparisonResult(NSString *  _Nonnull obj1, NSString *  _Nonnull obj2) {

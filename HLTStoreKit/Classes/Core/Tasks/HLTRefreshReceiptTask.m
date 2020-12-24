@@ -33,10 +33,6 @@ SKRequestDelegate
     return self;
 }
 
-- (void)dealloc {
-    HLTLog(@"%@ dealloc", NSStringFromClass(self.class));
-}
-
 #pragma mark - Operation Override
 
 - (void)start {
