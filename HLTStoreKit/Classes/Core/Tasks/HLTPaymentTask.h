@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class SKProduct;
 @protocol HLTAppleProductProvider <NSObject>
 
-- (void)fetchProductOfIdentifier:(NSString *)identifier completion:(void(^)(SKProduct * _Nullable product, NSError *_Nullable error))completion;
+- (void)fetchProductOfIdentifier:(NSString *)identifier completion:(HLTProductFetchCompletion)completion;
 
 @end
 

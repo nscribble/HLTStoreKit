@@ -58,7 +58,7 @@ typedef void(^HLTOrderConfigurationBlock)(id<HLTOrderConfiguration> configuratio
 // 交易结束回调
 typedef void(^HLTPaymentCompletion)(NSString *productId, NSString *orderId, NSError *error);
 // 查询商品信息回调
-typedef void(^HLTProductFetchCompletion)(NSString *productId, NSArray<SKProduct *> *products, NSError *error);
+typedef void(^HLTProductFetchCompletion)(NSString *productId, SKProduct *product, NSError *error);
 // 刷新凭据回调
 typedef void(^HLTReceiptRefreshCompletion)(NSError *error, NSURL *receiptURL);
 // 查询商品信息回调

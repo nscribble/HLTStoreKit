@@ -389,26 +389,26 @@ NSString * const HLTLogErrCodeKey = @"err_code";
 
 #pragma mark - HLTAppleProductProvider
 
-- (void)fetchProductOfIdentifier:(NSString *)identifier completion:(nonnull void (^)(SKProduct * _Nullable, NSError * _Nullable))completion {
+- (void)fetchProductOfIdentifier:(NSString *)identifier completion:(HLTProductFetchCompletion)completion {
     if (![identifier isKindOfClass:[NSString class]] ||
         identifier.length <= 0) {
         NSError *error = [self ht_storeKitErrorWithCode:HLTPaymentErrorProductIdInvalid
                                             description:@"商品信息有误"];
-        !completion ?: completion(nil, error);
+        !completion ?: completion(identifier, nil, error);
         
         return;
     }
     
     SKProduct *product = [self productForIdentifier:identifier];
     if (product && [product.productIdentifier isEqual:identifier]) {
-        !completion ?: completion(product, nil);
+        !completion ?: completion(identifier, product, nil);
         return;
     }
     
     __weak typeof(self) weakSelf = self;
     [self fetchProducts:@[identifier] completion:^(NSArray<SKProduct *> *products, NSError *error) {
         SKProduct *product = [weakSelf productForIdentifier:identifier];
-        !completion ?: completion(product, error);
+        !completion ?: completion(identifier, product, error);
     }];
 }
 

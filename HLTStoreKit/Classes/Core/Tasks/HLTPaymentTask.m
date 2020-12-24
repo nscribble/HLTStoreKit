@@ -155,7 +155,8 @@ SKProductsRequestDelegate
     
     NSAssert(self.productProvider != nil, @"productProvider is required when create a payment task");
     __weak typeof(self) ws = self;
-    [self.productProvider fetchProductOfIdentifier:self.productId completion:^(SKProduct * _Nullable product, NSError * _Nullable error) {
+    [self.productProvider fetchProductOfIdentifier:self.productId completion:^(NSString *productId, SKProduct *product, NSError *error) {
+        NSAssert([productId isEqual:self.productId], @"ProductId invalid!");
         [ws onFetchedProduct:product error:error];
     }];
 }
