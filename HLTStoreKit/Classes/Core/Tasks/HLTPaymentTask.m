@@ -14,6 +14,15 @@
 
 NSString * const HLTStoreKitErrorDomain = @"com.hlt.storekit.error";
 
+/*
+@interface HLTOrderModel (Private)
+@property (nonatomic,strong,readwrite) NSError *lastError;
+@end
+
+@implementation HLTOrderModel (Private)
+@end
+ */
+
 @interface HLTPaymentTask ()
 <
 SKProductsRequestDelegate
@@ -42,6 +51,10 @@ SKProductsRequestDelegate
     }
     
     return self;
+}
+
+- (void)dealloc {
+    HLTLog(@"%@ dealloc", NSStringFromClass(self.class));
 }
 
 - (NSString *)description {
@@ -374,20 +387,26 @@ SKProductsRequestDelegate
 
 - (void)callBackWithFatalError:(NSError *)error {
     HLTLog(@"[Task] payment failed: %@(%@)", error, error.underlyingError);
-    if (self.completion) {
-        self.completion(self.productId, self.order.orderId, error);
-    }
+    //self.order.lastError = error;
     
-    [self finishTask];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.completion) {
+            self.completion(self.productId, self.order.orderId, error);
+        }
+        
+        [self finishTask];
+    });
 }
 
 - (void)callBackSuccess {
     HLTLog(@"[Task] payment success: %@", self.order);
-    if (self.completion) {
-        self.completion(self.productId, self.order.orderId, nil);
-    }
-    
-    [self finishTask];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.completion) {
+            self.completion(self.productId, self.order.orderId, nil);
+        }
+        
+        [self finishTask];
+    });
 }
 
 @end

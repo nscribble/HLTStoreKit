@@ -27,6 +27,10 @@
     return self;
 }
 
+- (void)dealloc {
+    HLTLog(@"%@ dealloc", NSStringFromClass(self.class));
+}
+
 - (NSString *)description {
     return [NSString stringWithFormat:@"[Task.Retrival][%@][%@][%@]", self.productId, self.order.orderId,self.order.orderStatusDescription];
 }

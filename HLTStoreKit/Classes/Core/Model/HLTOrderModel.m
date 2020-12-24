@@ -17,6 +17,7 @@
 @property (nonatomic,strong,readwrite) SKPaymentTransaction *skTransaction;
 @property (nonatomic,assign,readwrite) NSTimeInterval updateTime;
 @property (nonatomic,copy,readwrite) NSString *sdkVersion;
+@property (nonatomic,strong,readwrite) NSError *lastError;
 
 @end
 
@@ -180,6 +181,7 @@
         _userInfo = [aDecoder decodeObjectOfClass:[NSDictionary class] forKey:NSStringFromSelector(@selector(userInfo))];
         _updateTime = [aDecoder decodeDoubleForKey:NSStringFromSelector(@selector(updateTime))];
         _sdkVersion = [aDecoder decodeObjectOfClass:[NSString class] forKey:NSStringFromSelector(@selector(sdkVersion))];
+        //_lastError = [aDecoder decodeObjectOfClass:[NSError class] forKey:NSStringFromSelector(@selector(lastError))];
     }
     
     return self;
@@ -199,6 +201,7 @@
     [aCoder encodeObject:self.userInfo forKey:NSStringFromSelector(@selector(userInfo))];
     [aCoder encodeDouble:self.updateTime forKey:NSStringFromSelector(@selector(updateTime))];
     [aCoder encodeObject:self.sdkVersion forKey:NSStringFromSelector(@selector(sdkVersion))];
+    //[aCoder encodeObject:self.lastError forKey:NSStringFromSelector(@selector(lastError))];
 }
 
 @end

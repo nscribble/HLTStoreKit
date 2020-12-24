@@ -47,6 +47,7 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
 }
 
 - (void)start {
+    HLTLog(@"order verifying start: %@(%@)", self.order.orderId, @(self.retryCount));
     NSAssert(hlt_orderVerifyProcessingBlock != NULL, @" error ");
     if (!hlt_orderVerifyProcessingBlock) {
         if (self.completion) {
@@ -120,7 +121,8 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
     if (self.dontRetry) {
         return NO;
     }
-    if (self.reqStatus == HLTVerifyReqStatusFinished) {
+    if (self.reqStatus == HLTVerifyReqStatusFinished ||
+        self.reqStatus == HLTVerifyReqStatusTimeout) {
         return NO;
     }
     
@@ -144,7 +146,15 @@ static NSInteger const kOrderVerifyMaxTryCount = 3;
         self.perReqTimeout += 5 * self.retryCount;
     }
     
-    [self performSelector:@selector(start) withObject:nil afterDelay:self.retryDelay];
+    __weak typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.retryDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) sself = weakSelf;
+        if (sself.reqStatus != HLTVerifyReqStatusFinished &&
+            sself.reqStatus != HLTVerifyReqStatusTimeout) {
+            [sself start];
+        }
+    });
+    
     self.retryDelay += 5 * self.retryCount;
 }
 

@@ -44,7 +44,7 @@
 - (void)onTapBtn:(UIButton *)button {
     
     NSString *productId = @"com.moment.coins12";
-    productId = @"com.moment.vip1";
+//    productId = @"com.moment.vip1";
 //    productId = @"com.moment.svip1";
         
     [[HLTStoreKit defaultStore] purchase:productId configuration:^(id<HLTOrderConfiguration> configuration) {

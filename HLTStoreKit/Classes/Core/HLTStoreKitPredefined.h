@@ -47,7 +47,6 @@ static NSString * const kLogEvent_SKPaymentFailed  = @"iap_payment_failed";
 static NSString * const kLogEvent_SKPaymentRestore = @"iap_payment_restore";
 static NSString * const kLogEvent_VerifySuccess    = @"iap_verify_success";
 static NSString * const kLogEvent_VerifyFailed     = @"iap_verify_failed";
-static NSString * const kLogEvent_PrefetchProductsSuccess  = @"iap_prefetch_products_success";
 static NSString * const kLogEvent_PrefetchProductsFailed  = @"iap_prefetch_products_failed";
 
 //#define HLTLog NSLog
@@ -75,6 +74,7 @@ typedef NS_ENUM(NSInteger, HLTPaymentErrorCode) {
     HLTPaymentErrorIAPTransactionFailed,
     HLTPaymentErrorVerifyOrderFailed,
     HLTPaymentErrorServiceShipped, // 服务已交付
+    HLTPaymentErrorVerifyOrderFailedButDontRetry,// 失败但不重试
 };
 
 // 任务状态

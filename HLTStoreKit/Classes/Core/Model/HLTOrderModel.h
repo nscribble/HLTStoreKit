@@ -42,9 +42,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,assign,readonly) NSTimeInterval updateTime;
 // 订单使用的SDK版本
 @property (nonatomic,copy,readonly) NSString *sdkVersion;
+// 最后的错误信息
+//@property (nonatomic,strong,readonly) NSError *lastError;
 
 // 用户自定义信息
 @property (nonatomic,strong) NSDictionary *userInfo;
+// 内存自定义对象（不会持久化）
 @property (nonatomic,strong) NSObject *userInfoObject;
 
 - (instancetype)initWithProductId:(NSString *)productId;

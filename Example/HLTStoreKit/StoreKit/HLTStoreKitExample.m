@@ -76,8 +76,8 @@
     [self setupOrderVerifierProcessing];
     
     [[HLTStoreKit defaultStore] setOrderGenerator:[HLTOrderDefaultGenerator new]];
-    //[[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderDefaultVerifier new]];
-    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTLocalReceiptVerifier new]];
+    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTOrderDefaultVerifier new]];
+//    [[HLTStoreKit defaultStore] setOrderVerifier:[HLTLocalReceiptVerifier new]];
     [[HLTStoreKit defaultStore] setOrderPersistence:[HLTOrderKeychainStore new]];
     [[HLTStoreKit defaultStore] startObservingTransaction];
     
@@ -189,6 +189,7 @@
 
 // 适配订单校验逻辑——
 + (void)setupOrderVerifierProcessing {
+    static NSInteger count = 0;
     [HLTOrderDefaultVerifier setRequestProcessingBlock:^(HLTOrderVerifierReq * _Nonnull request, HLTOrderVerifyCompletion  _Nonnull completion) {
         HLTOrderModel *order = request.order;
         if (!request.order) {
@@ -199,9 +200,17 @@
             return ;
         }
         
-        if (completion) {
-            completion(request, YES, nil);
+        BOOL result = NO;
+        if (count++ % 3 == 1) {
+            result = YES;
         }
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            HLTLog(@"[Verifier] result: %@", @(result));
+            if (completion) {
+                completion(request, result, nil);
+            }
+        });
         
 //        [HLTNetwork verifyOrder:order completion:^(HLTOrderModel * _Nonnull order, NSError * _Nonnull error) {
 //            BOOL success = (error == nil);

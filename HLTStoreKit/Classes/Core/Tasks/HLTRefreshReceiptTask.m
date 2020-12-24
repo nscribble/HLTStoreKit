@@ -33,7 +33,11 @@ SKRequestDelegate
     return self;
 }
 
-#pragma mark - Tasking
+- (void)dealloc {
+    HLTLog(@"%@ dealloc", NSStringFromClass(self.class));
+}
+
+#pragma mark - Operation Override
 
 - (void)start {
     @autoreleasepool {
@@ -50,6 +54,21 @@ SKRequestDelegate
         self.executing = YES;
     }
 }
+
+// 这里需要实现KVO相关的方法，NSOperationQueue是通过KVO来判断任务状态的
+- (void)setFinished:(BOOL)finished {
+    [self willChangeValueForKey:@"isFinished"];
+    _finished = finished;
+    [self didChangeValueForKey:@"isFinished"];
+}
+
+- (void)setExecuting:(BOOL)executing {
+    [self willChangeValueForKey:@"isExecuting"];
+    _executing = executing;
+    [self didChangeValueForKey:@"isExecuting"];
+}
+
+#pragma mark Tasking
 
 - (void)startTask {
     // TODO: 备份
@@ -74,7 +93,9 @@ SKRequestDelegate
 - (void)requestDidFinish:(SKRequest *)request {
     if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
         HLTLog(@"凭据已刷新");
-        !self.completion ?: self.completion(nil, [[NSBundle mainBundle] appStoreReceiptURL]);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            !self.completion ?: self.completion(nil, [[NSBundle mainBundle] appStoreReceiptURL]);
+        });
         
         [self finishTask];
     }
@@ -83,7 +104,9 @@ SKRequestDelegate
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
     if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
         HLTLog(@"⚠️凭据刷新失败");
-        !self.completion ?: self.completion(error, nil);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            !self.completion ?: self.completion(error, nil);
+        });
         
         [self finishTask];
     }

@@ -393,7 +393,8 @@ HLTPaymentTaskDelegate
     //[self.orderPersistence storeBackupOrder:task.order];
     //[self.orderPersistence removeOrder:task.order];
     
-    if (error.code == HLTPaymentErrorServiceShipped &&
+    if ((error.code == HLTPaymentErrorServiceShipped ||
+         error.code == HLTPaymentErrorVerifyOrderFailedButDontRetry) &&
         [error.domain isEqual:HLTStoreKitErrorDomain]) {// 不再尝试verify
         [self.orderPersistence storeBackupOrder:task.order];
         [self.orderPersistence removeOrder:task.order];

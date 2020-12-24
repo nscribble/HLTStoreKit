@@ -112,7 +112,8 @@ static HLTOrderGenReqProcessingBlock hlt_orderGenReqProcessingBlock;
 }
 
 - (BOOL)shouldRetryGenerating:(NSError *)error  {
-    if (self.reqStatus == HLTOrderReqStatusFinished) {
+    if (self.reqStatus == HLTOrderReqStatusFinished ||
+        self.reqStatus == HLTOrderReqStatusTimeout) {
         return NO;
     }
     
@@ -136,7 +137,15 @@ static HLTOrderGenReqProcessingBlock hlt_orderGenReqProcessingBlock;
         self.perReqTimeout += 5 * self.retryCount;
     }
     
-    [self performSelector:@selector(start) withObject:nil afterDelay:self.retryDelay];
+    __weak typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.retryDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) sself = weakSelf;
+        if (sself.reqStatus != HLTOrderReqStatusFinished &&
+            sself.reqStatus != HLTOrderReqStatusTimeout) {
+            [sself start];
+        }
+    });
+    
     self.retryDelay += 5 * self.retryCount;
 }
 

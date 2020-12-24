@@ -39,6 +39,10 @@ static NSInteger taskIdCount = 1000;
     return self;
 }
 
+- (void)dealloc {
+    HLTLog(@"%@ dealloc", NSStringFromClass(self.class));
+}
+
 + (NSString *)taskKeyForProductIdentifiers:(NSArray<NSString *> *)productIdentifiers {
     NSArray *sortedPids =
     [productIdentifiers sortedArrayUsingComparator:^NSComparisonResult(NSString *  _Nonnull obj1, NSString *  _Nonnull obj2) {
@@ -49,7 +53,7 @@ static NSInteger taskIdCount = 1000;
     return taskKey;
 }
 
-#pragma mark
+#pragma mark - Operation Override
 
 - (void)start {
     @autoreleasepool {
@@ -66,6 +70,21 @@ static NSInteger taskIdCount = 1000;
         self.executing = YES;
     }
 }
+
+// 这里需要实现KVO相关的方法，NSOperationQueue是通过KVO来判断任务状态的
+- (void)setFinished:(BOOL)finished {
+    [self willChangeValueForKey:@"isFinished"];
+    _finished = finished;
+    [self didChangeValueForKey:@"isFinished"];
+}
+
+- (void)setExecuting:(BOOL)executing {
+    [self willChangeValueForKey:@"isExecuting"];
+    _executing = executing;
+    [self didChangeValueForKey:@"isExecuting"];
+}
+
+#pragma mark  Tasking
 
 - (void)startTask {
     SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:self.productIdentifiers]];
@@ -97,9 +116,14 @@ static NSInteger taskIdCount = 1000;
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKProductSuccess,
                    @"productId": ([[response.products valueForKeyPath:@"productIdentifier"] componentsJoinedByString:@","] ?: @"")
                  }, @"SKProduct fetched");
+    
     if (self.completion) {
-        self.completion(response.products, nil);
+        HLTProductRequestCompletion completion = [self.completion copy];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            !completion ?: completion(response.products, nil);
+        });
     }
+    
     //[self finishTask];
 }
 
@@ -117,7 +141,10 @@ static NSInteger taskIdCount = 1000;
                    }, @"[Task] %@ failed: %@", request, error);
     
     if (self.completion) {
-        self.completion(nil, error);
+        HLTProductRequestCompletion completion = [self.completion copy];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            !completion ?: completion(nil, error);
+        });
     }
     [self finishTask];
 }
