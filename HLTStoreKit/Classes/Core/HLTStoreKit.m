@@ -227,7 +227,8 @@ NSString * const HLTLogErrCodeKey = @"err_code";
             }];
         }
         
-        [self _callbackFetchFor:taskKey products:products error:error];
+        NSArray *matchedProducts = [self filterProductsForKey:taskKey];
+        [self _callbackFetchFor:taskKey products:matchedProducts error:error];
         
         // 若单个fetch也在等待，且已成功取到products
         if (!error && products.count > 0 && self.fetchCallbacks.count > 0) {
