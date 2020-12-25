@@ -28,13 +28,14 @@
         _productId = productId;
         _orderId = [NSString stringWithFormat:@"temp|%@", @((NSInteger)[[NSDate date] timeIntervalSince1970])];
         _updateTime = [[NSDate date] timeIntervalSince1970];
+        _createdTime = [[NSDate date] timeIntervalSince1970];
     }
     
     return self;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"[Order][%@][%@][%@][%@][%@][%@][%@][count:%@]", self.productId, self.orderId, self.userIdentifier, [self orderStatusDescription], @(self.createdTime), @(self.iapBeginTime), @(self.iapFinishTime), @(self.receiptVerifyCount)];
+    return [NSString stringWithFormat:@"[Order][%@][%@][%@][%@][%@][%@][count:%@]", self.productId, self.orderId, self.userIdentifier, [self orderStatusDescription], @(self.createdTime), @(self.updateTime), @(self.receiptVerifyCount)];
 }
 
 - (NSString *)orderStatusDescription {

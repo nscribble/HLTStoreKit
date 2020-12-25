@@ -60,6 +60,7 @@ HLTPaymentTaskDelegate
     return queue;
 }
 
+
 - (instancetype)init {
     if (self = [super init]) {
         _launchTime = [[NSDate date] timeIntervalSince1970];
@@ -122,6 +123,7 @@ HLTPaymentTaskDelegate
 
 - (void)setTaskConcurrentCount:(NSInteger)count {
     NSAssert(count > 0, @"count must > 0");
+    HLTLog(@"[Task] maxConcurrentCount: %@", @(count));
     self.taskQueue.maxConcurrentOperationCount = count;
 }
 
@@ -771,14 +773,7 @@ HLTPaymentTaskDelegate
         return nil;
     }
     
-    orders = [orders sortedArrayUsingComparator:^NSComparisonResult(HLTOrderModel *  _Nonnull obj1, HLTOrderModel *  _Nonnull obj2) {
-        if (obj1.createdTime > obj2.createdTime) {
-            return NSOrderedAscending;
-        } else if (obj1.createdTime < obj2.createdTime) {
-            return NSOrderedDescending;
-        }
-        return NSOrderedSame;
-    }];
+    orders = [self sortedOrderList:orders];
     
     for (NSInteger index = 0; index < orders.count; index ++) {
         HLTOrderModel *order = orders[index];
@@ -795,6 +790,10 @@ HLTPaymentTaskDelegate
 }
 
 - (HLTOrderModel *)searchPotentialOrderWithProductId:(NSString *)productId {
+    return [self searchPotentialOrderWithProductId:productId expectedStatus:HLTOrderStatusPrepare];
+}
+
+- (HLTOrderModel *)searchPotentialOrderWithProductId:(NSString *)productId expectedStatus:(HLTOrderStatus)status {
     HLTOrderModel *candidate = nil;
     NSArray<HLTOrderModel *> *pendingOrders = [self.orderPersistence getPendingOrderList];
     
@@ -879,15 +878,18 @@ HLTPaymentTaskDelegate
 }
 
 - (NSArray<HLTOrderModel *> *)sortedOrderList:(NSArray *)orders {
-    NSArray<HLTOrderModel *> *sorted =
-    [orders sortedArrayUsingComparator:^NSComparisonResult(HLTOrderModel *  _Nonnull obj1, HLTOrderModel *  _Nonnull obj2) {
-        if (obj1.createdTime > obj2.createdTime) {
-            return NSOrderedAscending;
-        } else if (obj1.createdTime < obj2.createdTime) {
-            return NSOrderedDescending;
-        }
-        return NSOrderedSame;
+    NSSortDescriptor *sortCreatedTime = [NSSortDescriptor sortDescriptorWithKey:NSStringFromSelector(@selector(createdTime)) ascending:YES comparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [obj1 compare:obj2];
     }];
+    NSSortDescriptor *sortUpdateTime = [NSSortDescriptor sortDescriptorWithKey:NSStringFromSelector(@selector(updateTime)) ascending:NO comparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [obj1 compare:obj2];
+    }];
+    NSSortDescriptor *sortStatus = [NSSortDescriptor sortDescriptorWithKey:NSStringFromSelector(@selector(orderStatus)) ascending:NO comparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [obj1 compare:obj2];
+    }];
+    
+    NSArray<HLTOrderModel *> *sorted =
+    [orders sortedArrayUsingDescriptors:@[sortUpdateTime, sortStatus, sortCreatedTime]];
     
     return sorted;
 }

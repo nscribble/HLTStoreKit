@@ -157,4 +157,14 @@ static NSString * const HLTKeychainBackupOrders = @"com.hltstorekit.orders.backu
     return orderListM;
 }
 
+#pragma mark -
+
+- (void)dropPendingQueue {
+    [HLTKeychainStore setKeychainObject:nil forKey:HLTKeychainPendingOrders accessGroup:nil];
+}
+
+- (void)dropBackupQueue {
+    [HLTKeychainStore setKeychainObject:nil forKey:HLTKeychainBackupOrders accessGroup:nil];
+}
+
 @end
