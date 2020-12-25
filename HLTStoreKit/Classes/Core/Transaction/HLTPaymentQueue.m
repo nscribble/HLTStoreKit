@@ -815,6 +815,9 @@ HLTPaymentTaskDelegate
             ![order.productId isEqualToString:productId]) {
             continue;
         }
+        if (!order.orderId.length) {
+            continue;;
+        }
         
         if (order.orderStatus == HLTOrderStatusPurchasing || order.orderStatus == HLTOrderStatusReceiptVerifying) {
             [self updateOrderHint:order];
@@ -833,6 +836,9 @@ HLTPaymentTaskDelegate
         if (![order isKindOfClass:[HLTOrderModel class]] ||
             ![order.productId isEqualToString:productId]) {
             continue;
+        }
+        if (!order.orderId.length) {
+            continue;;
         }
         
         if (order.orderStatus >= HLTOrderStatusPurchasing) {
@@ -854,6 +860,9 @@ HLTPaymentTaskDelegate
             ![order.productId isEqualToString:productId]) {
             continue;
         }
+        if (!order.orderId.length) {
+            continue;;
+        }
         
         if (order.orderStatus == HLTOrderStatusPurchasing || order.orderStatus == HLTOrderStatusReceiptVerifying) {
             [self updateOrderHint:order];
@@ -872,6 +881,9 @@ HLTPaymentTaskDelegate
         if (![order isKindOfClass:[HLTOrderModel class]] ||
             ![order.productId isEqualToString:productId]) {
             continue;
+        }
+        if (!order.orderId.length) {
+            continue;;
         }
         
         if (order.orderStatus == HLTOrderStatusPurchasing ||// 可能未输入App Store密码、杀进程等
