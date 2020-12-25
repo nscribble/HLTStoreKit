@@ -169,6 +169,15 @@ HLTPaymentTaskDelegate
     NSAssert(task != nil, @"task should not be nil");
     if (self.currentTask != nil) {
         HLTLog(@"当前有支付任务!");
+        
+        [self.tasks enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(HLTPaymentTask * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([obj.order.orderId isEqual:task.order.orderId]) {
+                [obj addDependency:task];
+                *stop = YES;
+                
+                HLTLog(@"[Payment] has same orderId(%@), wait until %@", task.order.orderId, obj.taskId);
+            }
+        }];
     }
     task.delegate = self;
     [self.tasks addObject:task];// 添加到队列末
@@ -340,7 +349,7 @@ HLTPaymentTaskDelegate
 #pragma mark - HLTPaymentTaskDelegate
 
 - (void)taskWillStart:(HLTPaymentTask *)task {// todo: 回调队列
-    HLTLog(@"[Payment] taskWillStart: %@", task);
+    HLTLog(@"[Payment] taskWillStart: %@(%@)", task, task.taskId);
     self.currentTask = task;
     [self.onGoingTasks addObject:task];
     [[self metricsForPaymentTask:task] setTaskStartDate:[NSDate date]];
