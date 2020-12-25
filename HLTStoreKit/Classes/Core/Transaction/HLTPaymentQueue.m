@@ -209,19 +209,20 @@ HLTPaymentTaskDelegate
     CGFloat totoalCount = [[counts.allValues valueForKeyPath:@"@sum.integerValue"] floatValue];
     CGFloat weight = totoalCount / productCount;
     
+    NSTimeInterval timecost = 0;
     if (self.currentTask) {
         NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
-        NSTimeInterval timecost = (now - self.currentTask.startTime);
+        timecost = (now - self.currentTask.startTime);
         if (timecost > 60 * 5) {// 5分钟？= fetch1 + create1 + transaction1 + verify1(3)
             weight += (1 + self.currentTask.order.receiptVerifyCount * 0.5) * (timecost / 60 / 5);
         }
     }
     
-    if (weight >= 3) {
+    if (weight >= 4) {
         isLikelyAbnormal = YES;
     }
     
-    if (isLikelyAbnormal) {
+    if (isLikelyAbnormal && timecost > 60) {// 短时间多次回调排队处理、不检查异常
         HLTLog(@"[Payment ]may be a dead task[weight: %@], try to cancel current task", @(weight));
         HLTOrderStatus orderStatus = self.currentTask.order.orderStatus;
         if (orderStatus == HLTOrderStatusOrderFailed ||
