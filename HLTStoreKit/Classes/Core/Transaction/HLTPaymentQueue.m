@@ -656,6 +656,8 @@ HLTPaymentTaskDelegate
         return;
     }
     
+    [order updateWithSKPaymentTransaction:transaction];
+    
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center postNotificationName:HLTReceiveTransactionWithNoTaskNotification
                           object:transaction
