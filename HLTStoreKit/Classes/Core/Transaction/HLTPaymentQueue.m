@@ -488,7 +488,7 @@ HLTPaymentTaskDelegate
         return;
     }
     
-    // 非当前App周期发起的交易回调：检查订单队列、备份队列
+    // 非当前App周期（或多次回调）发起的交易回调：检查订单队列、备份队列
     NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
     BOOL isJailbreak = [HLTJailbreakDetect isJailbreak];
     HLTLogParams(@{HLTLogEventKey: kLogEvent_SKPaymentNoTask,
@@ -542,7 +542,7 @@ HLTPaymentTaskDelegate
     NSInteger count = [[NSUserDefaults standardUserDefaults] integerForKey:HLTStorageTransactionFailedCountKey];
     [[NSUserDefaults standardUserDefaults] setInteger:(count + 1) forKey:HLTStorageTransactionFailedCountKey];
     
-    // 当前App周期的任务
+    // 当前App周期的任务（进行中）
     HLTPaymentTask *task = [self searchTaskMatchingOrderId:orderId
                                                  productId:transaction.payment.productIdentifier];
     if (task) {
@@ -556,19 +556,19 @@ HLTPaymentTaskDelegate
     HLTOrderModel *order = nil;
     if (orderId) {// 检查orderId匹配的订单（可信度高）
         order = [self searchPendingOrderMatchingOrderId:orderId];
-        if (order) {
-            [self continueOrder:order onTransactionFailed:transaction];
-        }
-    } else {// 检查队列中状态合理的订单（可信度低）
-        order = [self searchPotentialOrderWithProductId:transaction.payment.productIdentifier];
-        if (order) {
-            [self continueOrder:order onTransactionFailed:transaction];
-        }
     }
+    if (!order) {// 检查队列中状态合理的订单（可信度低）
+        order = [self searchPotentialOrderWithProductId:transaction.payment.productIdentifier];
+    }
+//    if (orderId && !order) {// 即时拯救
+//        HLTLog(@"[Transaction] no order matching: %@", orderId);
+//        order = [self _createOrderForRescue:transaction orderId:orderId];
+//    }
     
-    if (!order) {// 即时拯救
-        HLTLog(@"[Transaction] no order matching: %@", orderId);
-        order = [self _createOrderForRescue:transaction orderId:orderId];
+    if (order &&
+        order.orderStatus != HLTOrderStatusPurchased &&
+        order.orderStatus != HLTOrderStatusReceiptVerified) {
+        [self continueOrder:order onTransactionFailed:transaction];
     }
     
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
@@ -762,17 +762,16 @@ HLTPaymentTaskDelegate
         return nil;
     }
     
-    for (HLTOrderModel *obj in orders) {
-        if (![obj isKindOfClass:[HLTOrderModel class]]) {
-            continue;
-        }
-        
-        if ([obj.orderId isEqualToString:orderId]) {
-            return obj;
-        }
-    }
+    orders =
+    [orders filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(HLTOrderModel * _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[HLTOrderModel class]] &&
+        evaluatedObject.orderStatus >= HLTOrderStatusOrderCreated &&
+        [evaluatedObject.orderId isEqual:orderId];
+    }]];
     
-    return nil;
+    orders = [self sortedOrderList:orders];
+    
+    return orders.firstObject;
 }
 
 - (HLTOrderModel *)searchBackupOrderMatchingOrderId:(NSString *)orderId {
@@ -785,20 +784,16 @@ HLTPaymentTaskDelegate
         return nil;
     }
     
+    orders =
+    [orders filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(HLTOrderModel * _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[HLTOrderModel class]] &&
+        evaluatedObject.orderStatus >= HLTOrderStatusOrderCreated &&
+        [evaluatedObject.orderId isEqual:orderId];
+    }]];
+    
     orders = [self sortedOrderList:orders];
     
-    for (NSInteger index = 0; index < orders.count; index ++) {
-        HLTOrderModel *order = orders[index];
-        if (![order isKindOfClass:[HLTOrderModel class]]) {
-            continue;
-        }
-        
-        if ([order.orderId isEqualToString:orderId]) {
-            return order;
-        }
-    }
-    
-    return nil;
+    return orders.firstObject;
 }
 
 - (HLTOrderModel *)searchPotentialOrderWithProductId:(NSString *)productId {
@@ -809,93 +804,38 @@ HLTPaymentTaskDelegate
     HLTOrderModel *candidate = nil;
     NSArray<HLTOrderModel *> *pendingOrders = [self.orderPersistence getPendingOrderList];
     
-    // 执行中任务
-    pendingOrders = [self sortedOrderList:pendingOrders];
-    for (NSInteger index = 0; index < pendingOrders.count; index ++) {
-        HLTOrderModel *order = pendingOrders[index];
-        if (![order isKindOfClass:[HLTOrderModel class]] ||
-            ![order.productId isEqualToString:productId]) {
-            continue;
-        }
-        if (!order.orderId.length) {
-            continue;;
-        }
-        
-        if (order.orderStatus == HLTOrderStatusPurchasing || order.orderStatus == HLTOrderStatusReceiptVerifying) {
-            [self updateOrderHint:order];
-            candidate = order;
-            break;
-        }
-    }
-    if (candidate) {
-        HLTLog(@"[Payment] Potential of Pending Order: %@", candidate);
-        return candidate;
-    }
+    pendingOrders =
+    [pendingOrders filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(HLTOrderModel * _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[HLTOrderModel class]] &&
+        evaluatedObject.orderId.length > 0 &&
+        [evaluatedObject.productId isEqual:productId] &&
+        /* Purchasing、Verifying 执行中任务*/
+        evaluatedObject.orderStatus >= HLTOrderStatusOrderCreated;
+    }]];
     
-    // 降低条件
-    for (NSInteger index = 0; index < pendingOrders.count; index ++) {
-        HLTOrderModel *order = pendingOrders[index];
-        if (![order isKindOfClass:[HLTOrderModel class]] ||
-            ![order.productId isEqualToString:productId]) {
-            continue;
-        }
-        if (!order.orderId.length) {
-            continue;;
-        }
-        
-        if (order.orderStatus >= HLTOrderStatusPurchasing) {
-            [self updateOrderHint:order];
-            candidate = order;
-            break;
-        }
-    }
+    candidate = pendingOrders.firstObject;
     if (candidate) {
+        [self updateOrderHint:candidate];
         HLTLog(@"[Payment] Potential of Pending Order: %@", candidate);
         return candidate;
     }
     
     NSArray<HLTOrderModel *> *backupOrders = [self.orderPersistence getBackedupOrderList];
+    backupOrders =
+    [backupOrders filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(HLTOrderModel * _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[HLTOrderModel class]] &&
+        evaluatedObject.orderId.length > 0 &&
+        [evaluatedObject.productId isEqual:productId] &&
+        evaluatedObject.orderStatus >= HLTOrderStatusOrderCreated;
+    }]];// Purchasing 可能未输入App Store密码、杀进程等
+    
     backupOrders = [self sortedOrderList:backupOrders];
-    for (NSInteger index = 0; index < backupOrders.count; index ++) {
-        HLTOrderModel *order = backupOrders[index];
-        if (![order isKindOfClass:[HLTOrderModel class]] ||
-            ![order.productId isEqualToString:productId]) {
-            continue;
-        }
-        if (!order.orderId.length) {
-            continue;;
-        }
-        
-        if (order.orderStatus == HLTOrderStatusPurchasing || order.orderStatus == HLTOrderStatusReceiptVerifying) {
-            [self updateOrderHint:order];
-            candidate = order;
-            break;
-        }
-    }
+    
+    candidate = backupOrders.firstObject;
     if (candidate) {
-        HLTLog(@"[Payment] Potential of Backup Order: %@", candidate);
-        return candidate;
+        [self updateOrderHint:candidate];
     }
     
-    
-    for (NSInteger index = 0; index < backupOrders.count; index ++) {
-        HLTOrderModel *order = backupOrders[index];
-        if (![order isKindOfClass:[HLTOrderModel class]] ||
-            ![order.productId isEqualToString:productId]) {
-            continue;
-        }
-        if (!order.orderId.length) {
-            continue;;
-        }
-        
-        if (order.orderStatus == HLTOrderStatusPurchasing ||// 可能未输入App Store密码、杀进程等
-            order.orderStatus == HLTOrderStatusPurchaseFailed ||
-            order.orderStatus == HLTOrderStatusReceiptFailed) {
-            [self updateOrderHint:order];
-            candidate = order;
-            break;
-        }
-    }
     HLTLog(@"[Payment] Potential of Backup Order: %@", candidate);
     
     return candidate;
