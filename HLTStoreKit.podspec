@@ -38,7 +38,7 @@ HLTStoreKit is to ease your pain for iap. just have a try.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = 'StoreKit', 'Foundation'
+  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 #  s.script_phase = { :name => "Update Version", :script => "sudo echo '#define HLTStoreKitVersion @\"#{s.version.to_s}\"' >  ${PODS_TARGET_SRCROOT}/HLTStoreKit/Classes/HLTStoreKitVersion.h", :execution_position => :before_compile , :shell_path => "/bin/sh"}
-
 #  s.dependency 'HLTAPIClient'
 end
