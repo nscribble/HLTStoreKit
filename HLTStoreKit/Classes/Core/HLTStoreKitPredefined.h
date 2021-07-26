@@ -150,6 +150,9 @@ typedef NS_ENUM(NSInteger, HLTOrderSource) {
 - (NSArray<HLTOrderModel *> *)getPendingOrderList;
 - (NSArray<HLTOrderModel *> *)getBackedupOrderList;
 
+- (void)dropPendingQueue;
+- (void)dropBackupQueue;
+
 - (NSArray<HLTOrderModel *> *)getOrderListInQueue:(NSString *)queue;
 - (void)storeOrder:(HLTOrderModel *)order inQueue:(NSString *)queue;
 - (void)removeOrder:(HLTOrderModel *)order inQueue:(NSString *)queue;

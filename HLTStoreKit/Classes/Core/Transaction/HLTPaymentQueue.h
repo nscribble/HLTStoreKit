@@ -58,8 +58,6 @@ extern NSString * const HLTStorageTransactionFailedCountKey;
  */
 //- (void)finishPaymentTask:(HLTPaymentTask *)task;
 
-- (NSArray<HLTOrderModel *> *)sortedOrderList:(NSArray *)orders;
-
 
 @end
 
