@@ -132,7 +132,7 @@ static NSInteger taskIdCount = 1000;
 /// The requestDidFinish: method is not called after this method is called.
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
     HLTLogParams(@{HLTLogEventKey: kLogEvent_PrefetchProductsFailed,
-                   HLTLogErrorKey: (error ?: @"errorNil"),
+                   HLTLogErrorKey: (error ?: @"errorNil"),// 待修改
                    @"productIds": (self.productIdentifiers ?: @"productIdNil"),
                    }, @"[Task] %@ failed: %@", request, error);
     
